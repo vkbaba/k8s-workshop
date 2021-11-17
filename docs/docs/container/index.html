@@ -1,0 +1,120 @@
+<!doctype html><html lang=en dir=ltr>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=description content="使用するラボ #   ワークショップの概要 #  コンテナは、OSレベルの仮想化の軽量な形態です。これにより、完全なOSを実行することなく、一連のアプリケーションプロセスを独自の分離された環境で実行することができます。
+このワークショップでは、コンテナ・イメージを構築して実行する方法の基本を学びます。使用するツールは、dockerです。">
+<meta name=theme-color content="#FFFFFF">
+<meta name=color-scheme content="light dark"><meta property="og:title" content="コンテナハンズオン">
+<meta property="og:description" content>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/docs/container/">
+<title>コンテナハンズオン | コンテナ/Kubernetes ハンズオン</title>
+<link rel=manifest href=/k8s-workshop/manifest.json>
+<link rel=icon href=/k8s-workshop/favicon.png type=image/x-icon>
+<link rel=stylesheet href=/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css integrity="sha256-RhgbyTN1upMgJudTs3xA5v+LsWqe93DHi8xmPkV3sbo=" crossorigin=anonymous>
+<script defer src=/k8s-workshop/flexsearch.min.js></script>
+<script defer src=/k8s-workshop/en.search.min.a1f08098274dcbcb786a905f5b9c2b0106306976b0d8420aa8e7415bd5827220.js integrity="sha256-ofCAmCdNy8t4apBfW5wrAQYwaXaw2EIKqOdBW9WCciA=" crossorigin=anonymous></script>
+</head>
+<body dir=ltr>
+<input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control>
+<main class="container flex">
+<aside class=book-menu>
+<div class=book-menu-content>
+<nav>
+<h2 class=book-brand>
+<a class="flex align-center" href=/k8s-workshop/><span>コンテナ/Kubernetes ハンズオン</span>
+</a>
+</h2>
+<div class=book-search>
+<input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/>
+<div class="book-search-spinner hidden"></div>
+<ul id=book-search-results></ul>
+</div>
+<ul>
+<li>
+<a href=https://vkbaba.github.io/k8s-workshop/docs/container/ class=active>コンテナハンズオン</a>
+<ul>
+<li>
+<a href=https://vkbaba.github.io/k8s-workshop/docs/container/basic/>基本操作</a>
+<ul>
+</ul>
+</li>
+<li>
+<a href=https://vkbaba.github.io/k8s-workshop/docs/container/network/>Web サーバーの公開</a>
+<ul>
+</ul>
+</li>
+<li>
+<a href=https://vkbaba.github.io/k8s-workshop/docs/container/image/>イメージ</a>
+<ul>
+</ul>
+</li>
+<li>
+<a href=https://vkbaba.github.io/k8s-workshop/docs/container/summary/>まとめ</a>
+<ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+</div>
+</aside>
+<div class=book-page>
+<header class=book-header>
+<div class="flex align-center justify-between">
+<label for=menu-control>
+<img src=/k8s-workshop/svg/menu.svg class=book-icon alt=Menu>
+</label>
+<strong>コンテナハンズオン</strong>
+<label for=toc-control>
+<img src=/k8s-workshop/svg/toc.svg class=book-icon alt="Table of Contents">
+</label>
+</div>
+<aside class="hidden clearfix">
+<nav id=TableOfContents>
+<ul>
+<li><a href=#使用するラボ>使用するラボ</a></li>
+<li><a href=#ワークショップの概要>ワークショップの概要</a></li>
+</ul>
+</nav>
+</aside>
+</header>
+<article class=markdown><h2 id=使用するラボ>
+使用するラボ
+<a class=anchor href=#%e4%bd%bf%e7%94%a8%e3%81%99%e3%82%8b%e3%83%a9%e3%83%9c>#</a>
+</h2>
+<figure><img src=c_access.png width=75% style=display:block;margin:auto>
+</figure>
+<h2 id=ワークショップの概要>
+ワークショップの概要
+<a class=anchor href=#%e3%83%af%e3%83%bc%e3%82%af%e3%82%b7%e3%83%a7%e3%83%83%e3%83%97%e3%81%ae%e6%a6%82%e8%a6%81>#</a>
+</h2>
+<p>コンテナは、OSレベルの仮想化の軽量な形態です。これにより、完全なOSを実行することなく、一連のアプリケーションプロセスを独自の分離された環境で実行することができます。</p>
+<p>このワークショップでは、コンテナ・イメージを構築して実行する方法の基本を学びます。使用するツールは、dockerです。</p>
+</article>
+<footer class=book-footer>
+<div class="flex flex-wrap justify-between">
+</div>
+<script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+</footer>
+<div class=book-comments>
+</div>
+<label for=menu-control class="hidden book-menu-overlay"></label>
+</div>
+<aside class=book-toc>
+<div class=book-toc-content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#使用するラボ>使用するラボ</a></li>
+<li><a href=#ワークショップの概要>ワークショップの概要</a></li>
+</ul>
+</nav>
+</div>
+</aside>
+</main>
+</body>
+</html>
