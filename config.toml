@@ -1,3 +1,4 @@
-baseURL = 'http://example.org/'
-languageCode = 'ja-jp'
+baseURL = 'https://vkbaba.github.io/k8s-workshop'
+languageCode = 'ja'
 title = 'コンテナ/Kubernetes ハンズオン'
+disableKinds = ["RSS", "sitemap"]
