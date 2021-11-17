@@ -3,3 +3,4 @@ languageCode = 'ja'
 title = 'コンテナ/Kubernetes ハンズオン'
 disableKinds = ["RSS", "sitemap"]
 publishDir = "docs"
+theme = "book"
