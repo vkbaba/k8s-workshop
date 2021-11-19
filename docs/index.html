@@ -1,9 +1,10 @@
-<!doctype html><html lang=en dir=ltr>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
 <head>
-<meta name=generator content="Hugo 0.89.2">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=description content="環境へのアクセス方法 #  本ハンズオンはTanzu Workshop の環境を使います。
+	<meta name="generator" content="Hugo 0.89.4" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="環境へのアクセス方法 #  本ハンズオンはTanzu Workshop の環境を使います。
 https://tanzu.vmware.com/developer/workshops/
 ハンズオンを実施するにはCustomer Connect (旧My VMware) またはgithub のアカウントが必要なので、あらかじめ作成しておきます。
 https://customerconnect.vmware.com/jp/account-registration
@@ -11,121 +12,299 @@ https://customerconnect.vmware.com/jp/account-registration
 諸注意 #  本ハンズオンは基本的にハンズオン中のマニュアルの日本語訳となっていますが、解説を加えたり、一部効率化するために手順が異なる場合があります。
 ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。
 しばらく操作をしないとラボから自動的に切断されますので、その場合は画面を更新してください。">
-<meta name=theme-color content="#FFFFFF">
-<meta name=color-scheme content="light dark"><meta property="og:title" content="はじめに">
-<meta property="og:description" content>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="はじめに" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/" />
+
 <title>はじめに | コンテナ/Kubernetes ハンズオン</title>
-<link rel=manifest href=/k8s-workshop/manifest.json>
-<link rel=icon href=/k8s-workshop/favicon.png type=image/x-icon>
-<link rel=stylesheet href=/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css integrity="sha256-RhgbyTN1upMgJudTs3xA5v+LsWqe93DHi8xmPkV3sbo=" crossorigin=anonymous>
-<script defer src=/k8s-workshop/flexsearch.min.js></script>
-<script defer src=/k8s-workshop/en.search.min.a1f08098274dcbcb786a905f5b9c2b0106306976b0d8420aa8e7415bd5827220.js integrity="sha256-ofCAmCdNy8t4apBfW5wrAQYwaXaw2EIKqOdBW9WCciA=" crossorigin=anonymous></script>
+<link rel="manifest" href="/k8s-workshop/manifest.json">
+<link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
+  <script defer src="/k8s-workshop/flexsearch.min.js"></script>
+  <script defer src="/k8s-workshop/en.search.min.926e46789b91eac4f7975381248c7eaa86e382ef90ff32a8728fed49fc015b86.js" integrity="sha256-km5GeJuR6sT3l1OBJIx&#43;qobjgu&#43;Q/zKoco/tSfwBW4Y=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
 </head>
-<body dir=ltr>
-<input type=checkbox class="hidden toggle" id=menu-control>
-<input type=checkbox class="hidden toggle" id=toc-control>
-<main class="container flex">
-<aside class=book-menu>
-<div class=book-menu-content>
-<nav>
-<h2 class=book-brand>
-<a class="flex align-center" href=/k8s-workshop/><span>コンテナ/Kubernetes ハンズオン</span>
-</a>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/k8s-workshop/"><span>コンテナ/Kubernetes ハンズオン</span>
+  </a>
 </h2>
-<div class=book-search>
-<input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/>
-<div class="book-search-spinner hidden"></div>
-<ul id=book-search-results></ul>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
 </div>
-<ul>
-<li>
-<a href=https://vkbaba.github.io/k8s-workshop/docs/container/>コンテナハンズオン</a>
-<ul>
-<li>
-<a href=https://vkbaba.github.io/k8s-workshop/docs/container/basic/>基本操作</a>
-<ul>
-</ul>
-</li>
-<li>
-<a href=https://vkbaba.github.io/k8s-workshop/docs/container/network/>Web サーバーの公開</a>
-<ul>
-</ul>
-</li>
-<li>
-<a href=https://vkbaba.github.io/k8s-workshop/docs/container/image/>イメージ</a>
-<ul>
-</ul>
-</li>
-<li>
-<a href=https://vkbaba.github.io/k8s-workshop/docs/container/summary/>まとめ</a>
-<ul>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/" class="">コンテナハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </nav>
-<script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+
+  <script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/k8s-workshop/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>はじめに</strong>
+
+  <label for="toc-control">
+    
+    <img src="/k8s-workshop/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
 </div>
-</aside>
-<div class=book-page>
-<header class=book-header>
-<div class="flex align-center justify-between">
-<label for=menu-control>
-<img src=/k8s-workshop/svg/menu.svg class=book-icon alt=Menu>
-</label>
-<strong>はじめに</strong>
-<label for=toc-control>
-<img src=/k8s-workshop/svg/toc.svg class=book-icon alt="Table of Contents">
-</label>
-</div>
-<aside class="hidden clearfix">
-<nav id=TableOfContents>
-<ul>
-<li><a href=#環境へのアクセス方法>環境へのアクセス方法</a></li>
-<li><a href=#諸注意>諸注意</a></li>
-</ul>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#環境へのアクセス方法">環境へのアクセス方法</a></li>
+    <li><a href="#諸注意">諸注意</a></li>
+  </ul>
 </nav>
-</aside>
-</header>
-<article class=markdown><h2 id=環境へのアクセス方法>
-環境へのアクセス方法
-<a class=anchor href=#%e7%92%b0%e5%a2%83%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9%e6%96%b9%e6%b3%95>#</a>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="環境へのアクセス方法">
+  環境へのアクセス方法
+  <a class="anchor" href="#%e7%92%b0%e5%a2%83%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9%e6%96%b9%e6%b3%95">#</a>
 </h2>
 <p>本ハンズオンはTanzu Workshop の環境を使います。<br>
-<a href=https://tanzu.vmware.com/developer/workshops/>https://tanzu.vmware.com/developer/workshops/</a></p>
+<a href="https://tanzu.vmware.com/developer/workshops/">https://tanzu.vmware.com/developer/workshops/</a></p>
 <p>ハンズオンを実施するにはCustomer Connect (旧My VMware) またはgithub のアカウントが必要なので、あらかじめ作成しておきます。</p>
-<p><a href=https://customerconnect.vmware.com/jp/account-registration>https://customerconnect.vmware.com/jp/account-registration</a></p>
+<p><a href="https://customerconnect.vmware.com/jp/account-registration">https://customerconnect.vmware.com/jp/account-registration</a></p>
 <p>前半はContainer Basics、 後半はKubernetes Fundamentals のコースを選択します。</p>
-<h2 id=諸注意>
-諸注意
-<a class=anchor href=#%e8%ab%b8%e6%b3%a8%e6%84%8f>#</a>
+<h2 id="諸注意">
+  諸注意
+  <a class="anchor" href="#%e8%ab%b8%e6%b3%a8%e6%84%8f">#</a>
 </h2>
 <p>本ハンズオンは基本的にハンズオン中のマニュアルの日本語訳となっていますが、解説を加えたり、一部効率化するために手順が異なる場合があります。</p>
 <p>ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。</p>
 <p>しばらく操作をしないとラボから自動的に切断されますので、その場合は画面を更新してください。</p>
 </article>
-<footer class=book-footer>
-<div class="flex flex-wrap justify-between">
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
 </div>
-<script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
-</footer>
-<div class=book-comments>
+
+
+
+  <script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
 </div>
-<label for=menu-control class="hidden book-menu-overlay"></label>
-</div>
-<aside class=book-toc>
-<div class=book-toc-content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#環境へのアクセス方法>環境へのアクセス方法</a></li>
-<li><a href=#諸注意>諸注意</a></li>
-</ul>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#環境へのアクセス方法">環境へのアクセス方法</a></li>
+    <li><a href="#諸注意">諸注意</a></li>
+  </ul>
 </nav>
-</div>
-</aside>
-</main>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
