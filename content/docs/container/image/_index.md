@@ -114,7 +114,7 @@ Dockerfileで使用できる命令の完全なリストについては、Dockerf
 この時点でのイメージの名前はgreetingなので、イメージレジストリの名前を含む名前をタグ付けするには、次のように実行する必要があります。
 
 ```shell
-NS=kubectl config view -o jsonpath='{.contexts[].context.namespace}'
+NS=$(kubectl config view -o jsonpath='{.contexts[].context.namespace}')
 ```
 {{< hint info >}}
 上記コマンドはハンズオンのセッションによって異なるレジストリの名前の一部を取得しています。
