@@ -19,7 +19,7 @@ cat ~/database/persistentvolumeclaim.yaml apiVersion: v1kind: PersistentVolumeC
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.fe2ee694025b29c9774a5110cf59e6a42718e9cc1a2124ab4ba953ad41c55429.js" integrity="sha256-/i7mlAJbKcl3SlEQz1nmpCcY6cwaISSrS6lTrUHFVCk=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -335,6 +335,8 @@ https://github.com/alex-shpak/hugo-book
   <ul>
     <li><a href="#ストレージの基本">ストレージの基本</a></li>
     <li><a href="#データベースとの接続">データベースとの接続</a></li>
+    <li><a href="#環境変数">環境変数</a></li>
+    <li><a href="#secret">Secret</a></li>
   </ul>
 </nav>
 
@@ -410,7 +412,7 @@ spec:
 </p>
 <details ><summary>補足</summary>
   <div class="markdown-inner">
-    今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から画像を保存するPV にアクセスさせることを可能にしたいため、厳密にいえばReadWriteMany のPV を使うべきですが、環境に寄ってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnceのストレージで十分です。
+    今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から、画像を保存するPV にアクセスさせることを可能にしたいため、厳密にいえばReadWriteMany のPV を使うべきですが、環境に寄ってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnceのストレージで十分です。
   </div>
 </details>
 
@@ -418,8 +420,7 @@ spec:
   データベースとの接続
   <a class="anchor" href="#%e3%83%87%e3%83%bc%e3%82%bf%e3%83%99%e3%83%bc%e3%82%b9%e3%81%a8%e3%81%ae%e6%8e%a5%e7%b6%9a">#</a>
 </h2>
-<p>フロントエンドのWebアプリケーションが動作しており、公共のインターネットからアクセスできます。この時点では、ファイルベースのSQLiteデータベースを使用しています。このデータベースは各インスタンスに対してローカルであり、すべてのインスタンス間で共有されていないため（スケールアップしたアプリケーションには不向き）、ポッドが再起動するたびにデータへの変更が失われます。</p>
-<p>データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働している別のPostgresqlデータベースを使用するように設定します。</p>
+<p>フロントエンドのWebアプリケーションが動作しており、インターネットからアクセスできます。データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働しているPostgresqlデータベースを使用するように設定されています。</p>
 <p>データベースのリソースを表示するには、以下を実行します。</p>
 <p>kubectl get deployment,service,pvc,secret -l app=blog-db -o name</p>
 <pre><code>deployment.apps/blog-db
@@ -427,26 +428,52 @@ service/blog-db
 persistentvolumeclaim/blog-database
 secret/blog-credentials
 </code></pre>
-<p>これで、デプロイメントとサービスの目的が理解できたはずです。persistentvolumeclaim は、データベースが使用する永続的なストレージを要求するために使用されます。secret は、データベースの認証情報を保持するために使用されます。</p>
-<p>データベースをフロントエンドのウェブアプリケーションにリンクさせるためには、フロントエンドのウェブアプリケーションにデータベースのホスト名とログイン認証情報を伝える必要があります。そのためには、フロントエンド Web アプリケーションの配置に環境変数の設定を追加する必要があります。</p>
+<p>Deployment とService、PVC の目的は先に説明した通りです。 Secret はデータベースの認証情報を保持するために使用されます。</p>
+<p>データベースをフロントエンドのWeb アプリケーションにリンクさせるためには、Web アプリケーションにデータベースのホスト名とログイン認証情報を伝える必要があります。いくつか方法がありますが、まずは環境変数でパラメータを渡す方法を見てみます。</p>
+<h2 id="環境変数">
+  環境変数
+  <a class="anchor" href="#%e7%92%b0%e5%a2%83%e5%a4%89%e6%95%b0">#</a>
+</h2>
 <p>フロントエンドWebアプリケーションにどのような環境変数がすでに設定されているかは、次のように実行すればわかります。</p>
-<p>kubectl set env deployment/blog &ndash;list
-これで表示されるはずです。</p>
-<h1 id="デプロイメントブログコンテナブログ">
-  デプロイメントブログ、コンテナブログ
-  <a class="anchor" href="#%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%83%a1%e3%83%b3%e3%83%88%e3%83%96%e3%83%ad%e3%82%b0%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%83%96%e3%83%ad%e3%82%b0">#</a>
-</h1>
-<p>BLOG_SITE_NAME=EduK8Sブログ
-フロントエンドWebアプリケーションの実装方法では、別のデータベースのために以下の環境変数を期待しています。</p>
-<p>DATABASE_HOST - データベースのホスト名です。
-DATABASE_USER - データベースにログインするユーザーです。
-DATABASE_PASSWORD - データベースにログインするユーザーのパスワードです。
-DATABASE_NAME - データベースの名前です。
-環境変数を設定するために、kubectlにはkubectl set envというコマンドが用意されています。本番の設定を更新するのではなく、ローカルに設定を保持するのですが、その設定に必要な変更を行うために使用します。</p>
-<p>データベースホストについては、ホスト名はデータベースサービスオブジェクトの名前、つまりblog-dbとなります。</p>
-<p>このセットでデプロイメント構成がどうなるかを確認するには、次のように実行します。</p>
-<p>kubectl set env deployment/blog DATABASE_HOST=blog-db &ndash;dry-run -o yaml
-出力結果を見ると、既存のBLOG_SITE_NAME環境変数に加えて、DATABASE_HOST環境変数が追加されていることがわかります。これは、spec.template.spec.container.envの設定の下にあります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl set env deployment/blog --list
+</code></pre></div><p>以下のように表示されるはずです。</p>
+<p>#Deployment blog, container blog
+BLOG_SITE_NAME=EduK8S Blog
+DATABASE_HOST=blog-db
+#DATABASE_USER from secret blog-credentials, key database-user
+#DATABASE_PASSWORD from secret blog-credentials, key database-password
+#DATABASE_NAME from secret blog-credentials, key database-name</p>
+<p>Pod 中のすべての環境変数を確認したい場合は以下のように実行することもできます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">DB<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>kubectl get pod -l app<span style="color:#f92672">=</span>blog-db -o template --template <span style="color:#e6db74">&#39;{{range .items}}{{.metadata.name}}{{&#34;\n&#34;}}{{end}}&#39;</span>. | head -1<span style="color:#e6db74">`</span> 
+kubectl exec $DB -- env
+</code></pre></div><p>Web アプリケーションのDeployment のマニフェストを確認すると、環境変数が定義されていることが分かります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat ~/frontent/deployment.yaml
+</code></pre></div><pre><code>spec:
+  containers:
+  - env:
+    - name: BLOG_SITE_NAME
+      value: EduK8S Blog
+    - name: DATABASE_HOST
+      value: blog-db
+</code></pre>
+<p>この場合は、ブログ名や接続するService 名を記載しています。my-svc.my-namespace.svc.cluster-domain.example のように厳密に記載することもできますが、このように省略することもできます。</p>
+<h2 id="secret">
+  Secret
+  <a class="anchor" href="#secret">#</a>
+</h2>
+<p>データベースの認証情報も同様にマニフェストに直接環境変数を書き込んで追加することができますが、Deployment のマニフェストとは別に管理するために、Secret を使うことが一般的です。このWeb アプリケーションでは、blog-credentialsというシークレットを見ることができます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get secret/blog-credentials -o yaml
+</code></pre></div><p>出力の中では、dataセクションに値が入っているのがわかります。</p>
+<p>data:
+database-name: YmxvZw==
+database-password: dG9wLXNlY3JldA==
+database-user: YmxvZw==</p>
+<p>表示されているのは、base64 エンコーディングで難読化されているため、実際の値ではありません。なお、デコードすると以下のようになります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">echo dG9wLXNlY3JldA<span style="color:#f92672">==</span> | base64 -d
+</code></pre></div><pre><code>top-secret
+</code></pre>
+<p>このSecret をファイルとしてコンテナに渡すこともできますが、この例ではSecret の値をPod の環境変数として注入していることに注意してください。</p>
+<p>いずれにせよ、これでどのデータベースにどのようにアクセスすべきか、フロントエンドのWeb アプリケーションに伝えることができました。</p>
 </article>
  
       
@@ -490,6 +517,8 @@ DATABASE_NAME - データベースの名前です。
   <ul>
     <li><a href="#ストレージの基本">ストレージの基本</a></li>
     <li><a href="#データベースとの接続">データベースとの接続</a></li>
+    <li><a href="#環境変数">環境変数</a></li>
+    <li><a href="#secret">Secret</a></li>
   </ul>
 </nav>
 

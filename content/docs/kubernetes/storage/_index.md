@@ -71,15 +71,13 @@ spec.template.spec.volumes に使用するPVC のリソースオブジェクト�
 {{</hint>}}
 
 {{<details "補足" >}}
-今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から画像を保存するPV にアクセスさせることを可能にしたいため、厳密にいえばReadWriteMany のPV を使うべきですが、環境に寄ってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnceのストレージで十分です。
+今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から、画像を保存するPV にアクセスさせることを可能にしたいため、厳密にいえばReadWriteMany のPV を使うべきですが、環境に寄ってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnceのストレージで十分です。
 {{</details>}}
 
 
 ## データベースとの接続
 
-フロントエンドのWebアプリケーションが動作しており、公共のインターネットからアクセスできます。この時点では、ファイルベースのSQLiteデータベースを使用しています。このデータベースは各インスタンスに対してローカルであり、すべてのインスタンス間で共有されていないため（スケールアップしたアプリケーションには不向き）、ポッドが再起動するたびにデータへの変更が失われます。
-
-データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働している別のPostgresqlデータベースを使用するように設定します。
+フロントエンドのWebアプリケーションが動作しており、インターネットからアクセスできます。データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働しているPostgresqlデータベースを使用するように設定されています。
 
 データベースのリソースを表示するには、以下を実行します。
 
@@ -90,28 +88,66 @@ kubectl get deployment,service,pvc,secret -l app=blog-db -o name
     persistentvolumeclaim/blog-database
     secret/blog-credentials
 
-これで、デプロイメントとサービスの目的が理解できたはずです。persistentvolumeclaim は、データベースが使用する永続的なストレージを要求するために使用されます。secret は、データベースの認証情報を保持するために使用されます。
+Deployment とService、PVC の目的は先に説明した通りです。 Secret はデータベースの認証情報を保持するために使用されます。
 
-データベースをフロントエンドのウェブアプリケーションにリンクさせるためには、フロントエンドのウェブアプリケーションにデータベースのホスト名とログイン認証情報を伝える必要があります。そのためには、フロントエンド Web アプリケーションの配置に環境変数の設定を追加する必要があります。
+データベースをフロントエンドのWeb アプリケーションにリンクさせるためには、Web アプリケーションにデータベースのホスト名とログイン認証情報を伝える必要があります。いくつか方法がありますが、まずは環境変数でパラメータを渡す方法を見てみます。
 
+## 環境変数
 フロントエンドWebアプリケーションにどのような環境変数がすでに設定されているかは、次のように実行すればわかります。
-
+```shell
 kubectl set env deployment/blog --list
-これで表示されるはずです。
+```
 
-# デプロイメントブログ、コンテナブログ
-BLOG_SITE_NAME=EduK8Sブログ
-フロントエンドWebアプリケーションの実装方法では、別のデータベースのために以下の環境変数を期待しています。
+以下のように表示されるはずです。
 
-DATABASE_HOST - データベースのホスト名です。
-DATABASE_USER - データベースにログインするユーザーです。
-DATABASE_PASSWORD - データベースにログインするユーザーのパスワードです。
-DATABASE_NAME - データベースの名前です。
-環境変数を設定するために、kubectlにはkubectl set envというコマンドが用意されています。本番の設定を更新するのではなく、ローカルに設定を保持するのですが、その設定に必要な変更を行うために使用します。
+  #Deployment blog, container blog
+  BLOG_SITE_NAME=EduK8S Blog
+  DATABASE_HOST=blog-db
+  #DATABASE_USER from secret blog-credentials, key database-user
+  #DATABASE_PASSWORD from secret blog-credentials, key database-password
+  #DATABASE_NAME from secret blog-credentials, key database-name
 
-データベースホストについては、ホスト名はデータベースサービスオブジェクトの名前、つまりblog-dbとなります。
+Pod 中のすべての環境変数を確認したい場合は以下のように実行することもできます。
+```shell
+DB=`kubectl get pod -l app=blog-db -o template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'. | head -1` 
+kubectl exec $DB -- env
+```
 
-このセットでデプロイメント構成がどうなるかを確認するには、次のように実行します。
+Web アプリケーションのDeployment のマニフェストを確認すると、環境変数が定義されていることが分かります。
+```shell
+cat ~/frontent/deployment.yaml
+```
+    spec:
+      containers:
+      - env:
+        - name: BLOG_SITE_NAME
+          value: EduK8S Blog
+        - name: DATABASE_HOST
+          value: blog-db
 
-kubectl set env deployment/blog DATABASE_HOST=blog-db --dry-run -o yaml
-出力結果を見ると、既存のBLOG_SITE_NAME環境変数に加えて、DATABASE_HOST環境変数が追加されていることがわかります。これは、spec.template.spec.container.envの設定の下にあります。
+この場合は、ブログ名や接続するService 名を記載しています。my-svc.my-namespace.svc.cluster-domain.example のように厳密に記載することもできますが、このように省略することもできます。
+
+## Secret
+
+データベースの認証情報も同様にマニフェストに直接環境変数を書き込んで追加することができますが、Deployment のマニフェストとは別に管理するために、Secret を使うことが一般的です。このWeb アプリケーションでは、blog-credentialsというシークレットを見ることができます。
+
+```shell
+kubectl get secret/blog-credentials -o yaml
+```
+
+出力の中では、dataセクションに値が入っているのがわかります。
+
+  data:
+    database-name: YmxvZw==
+    database-password: dG9wLXNlY3JldA==
+    database-user: YmxvZw==
+    
+表示されているのは、base64 エンコーディングで難読化されているため、実際の値ではありません。なお、デコードすると以下のようになります。
+```shell
+echo dG9wLXNlY3JldA== | base64 -d
+```
+    top-secret
+
+このSecret をファイルとしてコンテナに渡すこともできますが、この例ではSecret の値をPod の環境変数として注入していることに注意してください。
+
+いずれにせよ、これでどのデータベースにどのようにアクセスすべきか、フロントエンドのWeb アプリケーションに伝えることができました。
