@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="名前空間 #  ネットワークの前に簡単にNamespace (名前空間) に関して説明します。名前空間はKubernetes におけるリソースを適切に分離する仕組みのことです。例えば、1つのKubernetes クラスタを複数で利用する際に、名前空間を分けない場合はアプリケーションの名前が被ってはいけませんが、名前空間を分けることで、このような重複を気にする必要がなくなります。他にも、名前空間の間の通信を制御したり、機能を制限したりと、Kubernetes におけるマルチテナントの提供形態の1 つと言い換えることもできます。
+例えば、これまでのハンズオンの中でkubectl を使った操作の時には名前空間を意識していませんでしたが、実際はハンズオンのセッションごとに個別に割り当てられた名前空間の中で作業をしていました。
+名前空間を指定しない場合：
+kubectl get pod 名前空間を指定する場合：
+kubectl get pod -n ${NS} 通常、何も設定しない場合のデフォルトの名前空間の名前は&quot;default&quot;となります。  このハンズオンの仕組みとして、ユーザーのセッションごとに個別に名前空間が割り当てられ、みなさんはその名前空間の中で作業しています。
+kubectl get namespaces NAME STATUS AGEdefault Active 68deduk8s Active 68deduk8s-ingress Active 68deduk8s-labs-ui Active 68deduk8s-labs-w01 Active 68deduk8s-labs-w01-s283 Active 172meduk8s-labs-w01-s284 Active 109meduk8s-labs-w01-s285 Active 46m... ただし、他のユーザーに割り当てられた名前空間やKubernetes が内部で使用している名前空間へのアクセスは制限されています。名前空間ごとに適切にアクセスコントロールができていると言えますね。
+kubectl get pod -n kube-system Error from server (Forbidden): pods is forbidden: User &quot;system:serviceaccount:eduk8s-labs-w01:eduk8s-labs-w01-s283&quot; cannot list resource &quot;pods&quot; in API group &quot;&quot; in the namespace &quot;kube-system&quot; Kubernetes のネットワークの基本 #  Kubernetes ではPod 単位でIP アドレスがアサインされます。各ポッドに割り当てられているIPアドレスは、次のように実行することで確認できます。">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="ネットワーク" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" />
+
+<title>ネットワーク | コンテナ/Kubernetes ハンズオン</title>
+<link rel="manifest" href="/k8s-workshop/manifest.json">
+<link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
+  <script defer src="/k8s-workshop/flexsearch.min.js"></script>
+  <script defer src="/k8s-workshop/en.search.min.fe2ee694025b29c9774a5110cf59e6a42718e9cc1a2124ab4ba953ad41c55429.js" integrity="sha256-/i7mlAJbKcl3SlEQz1nmpCcY6cwaISSrS6lTrUHFVCk=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" href="/k8s-workshop/css/copy.css">
+<script defer src="/k8s-workshop/js/copy.js"></script>
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/k8s-workshop/"><span>コンテナ/Kubernetes ハンズオン</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/" class="">コンテナハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/" class="">Kubernetes ハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class="">リソースの詳細</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class=" active">ネットワーク</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class="">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/k8s-workshop/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>ネットワーク</strong>
+
+  <label for="toc-control">
+    
+    <img src="/k8s-workshop/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#名前空間">名前空間</a></li>
+    <li><a href="#kubernetes-のネットワークの基本">Kubernetes のネットワークの基本</a></li>
+    <li><a href="#service-リソース">Service リソース</a></li>
+    <li><a href="#ingress-によるservice-の公開">Ingress によるService の公開</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="名前空間">
+  名前空間
+  <a class="anchor" href="#%e5%90%8d%e5%89%8d%e7%a9%ba%e9%96%93">#</a>
+</h2>
+<p>ネットワークの前に簡単にNamespace (名前空間) に関して説明します。名前空間はKubernetes におけるリソースを適切に分離する仕組みのことです。例えば、1つのKubernetes クラスタを複数で利用する際に、名前空間を分けない場合はアプリケーションの名前が被ってはいけませんが、名前空間を分けることで、このような重複を気にする必要がなくなります。他にも、名前空間の間の通信を制御したり、機能を制限したりと、Kubernetes におけるマルチテナントの提供形態の1 つと言い換えることもできます。</p>
+<p>例えば、これまでのハンズオンの中でkubectl を使った操作の時には名前空間を意識していませんでしたが、実際はハンズオンのセッションごとに個別に割り当てられた名前空間の中で作業をしていました。</p>
+<p>名前空間を指定しない場合：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pod
+</code></pre></div><p>名前空間を指定する場合：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pod -n <span style="color:#e6db74">${</span>NS<span style="color:#e6db74">}</span>
+</code></pre></div><blockquote class="book-hint info">
+  通常、何も設定しない場合のデフォルトの名前空間の名前は&quot;default&quot;となります。
+</blockquote>
+
+<p>このハンズオンの仕組みとして、ユーザーのセッションごとに個別に名前空間が割り当てられ、みなさんはその名前空間の中で作業しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get namespaces
+</code></pre></div><pre><code>NAME                   STATUS   AGE
+default                Active   68d
+eduk8s                 Active   68d
+eduk8s-ingress         Active   68d
+eduk8s-labs-ui         Active   68d
+eduk8s-labs-w01        Active   68d
+eduk8s-labs-w01-s283   Active   172m
+eduk8s-labs-w01-s284   Active   109m
+eduk8s-labs-w01-s285   Active   46m
+...
+</code></pre>
+<p>ただし、他のユーザーに割り当てられた名前空間やKubernetes が内部で使用している名前空間へのアクセスは制限されています。名前空間ごとに適切にアクセスコントロールができていると言えますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pod -n kube-system
+</code></pre></div><pre><code>Error from server (Forbidden): pods is forbidden: User &quot;system:serviceaccount:eduk8s-labs-w01:eduk8s-labs-w01-s283&quot; cannot list resource &quot;pods&quot; in API group &quot;&quot; in the namespace &quot;kube-system&quot;
+</code></pre>
+<h2 id="kubernetes-のネットワークの基本">
+  Kubernetes のネットワークの基本
+  <a class="anchor" href="#kubernetes-%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e3%81%ae%e5%9f%ba%e6%9c%ac">#</a>
+</h2>
+<p>Kubernetes ではPod 単位でIP アドレスがアサインされます。各ポッドに割り当てられているIPアドレスは、次のように実行することで確認できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pods -l app<span style="color:#f92672">=</span>blog -o wide
+</code></pre></div><pre><code>NAME                    READY   STATUS    RESTARTS   AGE   IP               NODE                                       NOMINATED NODE   READINESS GATES
+blog-65c8484545-br9mf   1/1     Running   0          28m   192.168.12.67    ip-10-0-3-148.us-east-2.compute.internal   &lt;none&gt;           &lt;none&gt;
+blog-65c8484545-qbvvp   1/1     Running   0          49m   192.168.12.111   ip-10-0-3-148.us-east-2.compute.internal   &lt;none&gt;           &lt;none&gt;
+</code></pre>
+<p>これらのIPアドレスは、Kubernetesクラスタ内でのみアクセス可能です。直接、外部からアクセスすることはできません。</p>
+<p>Pod は複数のコンテナを含む場合は、そのコンテナ間の通信はlocalhost で実行され、待ち受けるポートは重複してはいけません。例えば、1つのPod の中に80番ポートで待ち受けるnginx コンテナを2つ以上含めることはできません。</p>
+<p>Pod 間の通信は、CNI (Container Network Interface) プラグインが担います。つまり、CNI は、このようにPod によしなにIP アドレスを振って、Pod 同士が通信できるよう取り計らう役割を持っています。Kubernetes クラスタを作成する場合CNI プラグインのインストールが必要なため、今回のハンズオン環境では確認することはできませんが、この環境にも当然CNI はインストールされています。CNI の例としては、<a href="https://www.tigera.io/project-calico/" target="_blank">
+    Calico
+</a> や<a href="https://antrea.io/" target="_blank">
+    Antrea
+</a>
+が挙げられます。</p>
+<h2 id="service-リソース">
+  Service リソース
+  <a class="anchor" href="#service-%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9">#</a>
+</h2>
+<p>次に、Pod と外部との通信ですが、これはKubernetes のリソースであるService リソースを介して行われます。先ほど説明した通り、Pod のIPアドレスは、Kubernetesクラスタ内でのみアクセス可能ですので、直接外部ネットワークからアクセスすることは基本的にできません。</p>
+<p>加えて、Pod は短命です。Replicaset の役割はPod をレプリカの数だけ稼働させることであり、停止したPod を再起動させるわけではなく、再作成します。この場合はPod の名前やIPアドレスも変更されます。すなわち、通信先のコンポーネントのIP アドレスは変わるものとしてアプリケーションを設計しなければなりません。</p>
+<p>アプリケーションに安定したIPアドレスとホスト名を割り当て、かつ外部との接続を実現するために、Kubernetes にはService リソースと呼ばれるリソースがあります。
+<blockquote class="book-hint info">
+  Service という名前がややこしいですが、Pod やDeployment などと同様、Kubernetes にService という名前のリソースがあります。
+</blockquote>
+</p>
+<p>さっそくService リソースのマニフェストを確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat ~/frontend/service.yaml
+</code></pre></div><pre><code>apiVersion: v1
+kind: Service
+metadata:
+name: blog
+labels:
+    app: blog
+spec:
+type: ClusterIP
+selector:
+    app: blog
+ports:
+- name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+</code></pre>
+<p>これをkubectl apply すると、blog という名前のService が作成されたことになります。このマニフェストは「app:blog というラベルが付いたアプリケーションのためにポート8080 を公開し、Pod が待ち受けているポート8080 にマッピングします」ということを意味しています。</p>
+<p>既にこのService は作成されているため、Service の詳細を確認してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get service --selector app<span style="color:#f92672">=</span>blog -o wide 
+</code></pre></div><p>これにより、以下のような出力が表示されます。</p>
+<pre><code>NAME   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+blog   ClusterIP   10.108.113.113   &lt;none&gt;        8080/TCP   28m   app=blog
+</code></pre>
+<p>SELECTOR に注目しましょう。これはマニフェスト中のspec.selector の値です。</p>
+<pre><code>selector:
+    app: blog
+</code></pre>
+<p>これは、どのPod をService のエンドポイントとして登録するかを定義していて、これはラベルによって制御されます。すなわち下記のコマンドの実行で得られるPod をService のエンドポイントとして登録し、Service のIP アドレスでアクセスできるようにします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pods -l app<span style="color:#f92672">=</span>blog -o name
+</code></pre></div><blockquote class="book-hint info">
+  ラベル管理を適切にしないと、意図しないPod がService のバックエンドに配置される場合があります。
+</blockquote>
+
+<p>なお、サービスに対して登録されているポッドのIPアドレスは、次のように実行することで確認できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get endpoints blog
+</code></pre></div><p>Service のIPアドレスはそのService が存続する限り変更されることはありませんが、それでもそのIP は使用すべきではありません。代わりに、Service に対応するホスト名を使用するべきです。ホスト名は自動的にKubernetesクラスタの内部DNSに登録され、クラスタ内のどのアプリケーションでも使用できます。ホスト名の命名規則については下記ドキュメントを参照してください。</p>
+<p>参考：<a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/" target="_blank">
+    https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
+</a></p>
+<p>注意点として、今回作成したService に対して、Kubernetesクラスタの外から直接そのIP アドレスやホスト名にアクセスすることはできません。これは、今回作成したService がClusterIP と呼ばれるタイプであり、Pod のIP アドレスと同様、ClusterIP はクラスタ内で使用される安定したIP アドレスやホスト名の提供を目的としているためです。</p>
+<details ><summary>補足</summary>
+  <div class="markdown-inner">
+    <p>実はこの環境ではmy-svc.my-namespace.svc.cluster-domain.example （もしくはIP アドレス）のような形でターミナルからアクセスできます。本環境の場合は以下のようになります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl http://blog.<span style="color:#e6db74">${</span>NS<span style="color:#e6db74">}</span>.svc.cluster.local:8080
+</code></pre></div><p>ただし、ターミナルの外、すなわちブラウザの別タブなどからアクセスすることはできません。これは、今回のハンズオン環境で提供されるターミナルの実体がまさにKubernetes のPod であり、そこからcurl を実行するということは、クラスタ内での通信に他ならないからです。</p>
+
+  </div>
+</details>
+
+<h2 id="ingress-によるservice-の公開">
+  Ingress によるService の公開
+  <a class="anchor" href="#ingress-%e3%81%ab%e3%82%88%e3%82%8bservice-%e3%81%ae%e5%85%ac%e9%96%8b">#</a>
+</h2>
+<p>Service をKubernetes クラスタの外からアクセスできるように公開するためには、Ingressリソースオブジェクトを作成する必要があります。</p>
+<p>今回使用するIngressリソースオブジェクトの定義を見るには、runを使用します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat ~/frontend/ingress.yaml
+</code></pre></div><pre><code>apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+name: blog
+labels:
+    app: blog
+spec:
+rules:
+- host: blog-eduk8s-labs-w01-s284.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+    http:
+    paths:
+    - path: &quot;/&quot;
+        backend:
+        serviceName: blog
+        servicePort: 8080
+</code></pre>
+<p>この例では、blog-eduk8s-lab-w01-s284.tdc-reg-prod-d66138e.tanzu-lab.esp.vmware.comというホスト名で受信したHTTPリクエストは、blogという名前を持つService（つまりアプリケーション）に向けられるべきだというルールになっています。</p>
+<p>外部のユーザーがWebブラウザからホスト名にアクセスする場合、HTTPトラフィックに標準のポート80を使用しますが、ルーターはそのトラフィックをサービスのポート8080に渡します。</p>
+<p>Ingress も既に作成しているので、以下のコマンドで確認することができます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get ingress -l app<span style="color:#f92672">=</span>blog
+</code></pre></div><p>払い出されたURL を使ってWebブラウザからフロントエンドのWebアプリケーションにアクセスできます。ターミナルではなく、ブラウザの別タブから払い出されたURL にアクセスしてください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">NS<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>kubectl config view -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.contexts[].context.namespace}&#39;</span><span style="color:#66d9ef">)</span>
+echo $NS
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">http://blog-<span style="color:#e6db74">${</span>NS<span style="color:#e6db74">}</span>.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+</code></pre></div><blockquote class="book-hint info">
+  <p>1つ目のコマンドはこの環境で払い出されるURL 名の一部（名前空間）を取得しています。URL 中の${NS} は取得した名前空間で置き換えてください。例えば下記のようになります。</p>
+<p><a href="http://blog-eduk8s-labs-w01-s287.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com" target="_blank">
+    http://blog-eduk8s-labs-w01-s287.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+</a></p>
+
+</blockquote>
+
+<blockquote class="book-hint warning">
+  この時点では 500 Internal Server Error が表示されることに注意してください。
+</blockquote>
+
+<p>このリンクをクリックして、フロントエンドのWebアプリケーションにアクセスします。利用できないと表示された場合は、利用できるようになるまでページを更新してください。これは、Ingress ルーティングの再設定に時間がかかるためです。</p>
+<p>これは、このホストのトラフィックをKubernetesクラスタのルータに向けるために、外部のドメインネームサーバ（DNS）でワイルドカードCNAMEがすでに事前に設定されているために機能することに注意してください。これが自分のKubernetesクラスタであれば、使用したいホストのDNSに適切なCNAMEを設定する必要があります。</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#名前空間">名前空間</a></li>
+    <li><a href="#kubernetes-のネットワークの基本">Kubernetes のネットワークの基本</a></li>
+    <li><a href="#service-リソース">Service リソース</a></li>
+    <li><a href="#ingress-によるservice-の公開">Ingress によるService の公開</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

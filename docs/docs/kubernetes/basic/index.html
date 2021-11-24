@@ -26,7 +26,7 @@ secret/blog-credentials created (dry run)service/blog-db created (dry run)pers
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.4daa2d728d66588922e8c5e27a2f7908eda33411dff532e7fc4091165c674456.js" integrity="sha256-Taotco1mWIki6MXiei95CO2jNBHf9TLn/ECRFlxnRFY=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.fe2ee694025b29c9774a5110cf59e6a42718e9cc1a2124ab4ba953ad41c55429.js" integrity="sha256-/i7mlAJbKcl3SlEQz1nmpCcY6cwaISSrS6lTrUHFVCk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -182,6 +182,24 @@ https://github.com/alex-shpak/hugo-book
   
 
   
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class=" active">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
     <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class="">リソースの詳細</a>
   
 
@@ -200,7 +218,61 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class=" active">基本操作</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class="">ネットワーク</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class="">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/summary/" class="">まとめ</a>
   
 
           
@@ -347,12 +419,22 @@ ingress.extensions/blog created
   <a class="anchor" href="#%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%97%e3%81%9f%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9">#</a>
 </h2>
 <p>フロントエンドのWebアプリケーション用にingressオブジェクトが作成されていることに注目してください。このオブジェクトは、アクセス可能なURLを払い出し、Webアプリケーションへのアクセスを設定します。</p>
-<p>この例では、WebアプリケーションにアクセスするためのURLは次のようになります。</p>
+<p>この例では、WebアプリケーションにアクセスするためのURLは次のようになります。ターミナルではなく、ブラウザの別タブから払い出されたURL にアクセスしてください。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">NS<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>kubectl config view -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.contexts[].context.namespace}&#39;</span><span style="color:#66d9ef">)</span>
-http://<span style="color:#e6db74">${</span>NS<span style="color:#e6db74">}</span>.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
-</code></pre></div><p>{{hint info}}
-1つ目のコマンドはこの環境で払い出されるURL 名の一部を取得しています。
-{{/hint}}</p>
+echo $NS
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">http://blog-<span style="color:#e6db74">${</span>NS<span style="color:#e6db74">}</span>.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+</code></pre></div><p><blockquote class="book-hint info">
+  <p>1つ目のコマンドはこの環境で払い出されるURL 名の一部（名前空間）を取得しています。URL 中の${NS} は取得した名前空間で置き換えてください。例えば下記のようになります。</p>
+<p><a href="http://blog-eduk8s-labs-w01-s287.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com" target="_blank">
+    http://blog-eduk8s-labs-w01-s287.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+</a></p>
+
+</blockquote>
+
+<blockquote class="book-hint warning">
+  この時点では 500 Internal Server Error が表示されることに注意してください。
+</blockquote>
+</p>
 <p>このリンクをクリックして、フロントエンドのWebアプリケーションにアクセスします。利用できないと表示された場合は、利用できるようになるまでページを更新してください。これは、Ingress の設定に時間がかかる場合があるためです。</p>
 <p>まだ、ブログ記事は表示されません。データベースの設定と入力については後ほど説明します。</p>
 <p>KubernetesクラスタのWebコンソールを使用すると、どのリソースが作成されているか、またそれらのリソース間の関係をブラウザで視覚的に表示することができますが、ほとんどの開発者はkubectlを使用してコマンドラインからKubernetesクラスタを操作します。</p>

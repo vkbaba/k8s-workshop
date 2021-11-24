@@ -91,14 +91,25 @@ kubectl rollout status deployment/blog
 ## デプロイしたアプリケーションへのアクセス
 フロントエンドのWebアプリケーション用にingressオブジェクトが作成されていることに注目してください。このオブジェクトは、アクセス可能なURLを払い出し、Webアプリケーションへのアクセスを設定します。
 
-この例では、WebアプリケーションにアクセスするためのURLは次のようになります。
+この例では、WebアプリケーションにアクセスするためのURLは次のようになります。ターミナルではなく、ブラウザの別タブから払い出されたURL にアクセスしてください。
+
 ```shell
 NS=$(kubectl config view -o jsonpath='{.contexts[].context.namespace}')
-http://${NS}.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+echo $NS
 ```
-{{hint info}}
-1つ目のコマンドはこの環境で払い出されるURL 名の一部を取得しています。
-{{/hint}}
+```shell
+http://blog-${NS}.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+```
+
+{{<hint info>}}
+1つ目のコマンドはこの環境で払い出されるURL 名の一部（名前空間）を取得しています。URL 中の${NS} は取得した名前空間で置き換えてください。例えば下記のようになります。
+
+http://blog-eduk8s-labs-w01-s287.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+
+{{</hint>}}
+{{<hint warning>}}
+この時点では 500 Internal Server Error が表示されることに注意してください。
+{{</hint>}}
 
 このリンクをクリックして、フロントエンドのWebアプリケーションにアクセスします。利用できないと表示された場合は、利用できるようになるまでページを更新してください。これは、Ingress の設定に時間がかかる場合があるためです。
 

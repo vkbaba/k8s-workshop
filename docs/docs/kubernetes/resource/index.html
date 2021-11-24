@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="リソース #  ">
+<meta name="description" content="Deployment, Replicaset, #  前の手順でDeployment を作成しましたが、Deployment は追加のリソースを作成します。調べてみましょう。
+kubectl get all -o name -l app=blog all はリソース名ではなく、Kubernetesのコアのリソースタイプを表示するエイリアスです。
+出力は以下のようになるはずです。
+pod/blog-6b8999855c-6jjhj pod/blog-6b8999855c-zk8pg deployment.apps/blog replicaset.apps/blog-6b8999855c Deployment を作成しただけなのに、結果的にReplicaset とPod のリソースが追加で作成されています。
+これは、Deploymentが、Replicaset を作成するためのテンプレートとして機能するためです。また、Replicaset は、Pod を作成するためのテンプレートとして機能します。Pod は、アプリケーションのインスタンスを表すものです。このケースでは、レプリカの数が2に設定されているため、2つのPod が存在します。
+Replicaset のリソース定義を表示するには、次のように実行します。
+kubectl get replicaset -l app=blog -o yaml spec:replicas: 2selector:matchLabels:app: blogpod-template-hash: &quot;896156207&quot;template:metadata:creationTimestamp: nulllabels:app: blogpod-template-hash: &quot;896156207&quot;spec:containers:- env:- name: BLOG_SITE_NAMEvalue: EduK8S Blogimage: quay.io/eduk8s-labs/app-k8s-fundamentals-frontend:latestimagePullPolicy: Alwaysname: blogports:- containerPort: 8080protocol: TCPresources: {}terminationMessagePath: /dev/termination-logterminationMessagePolicy: FilednsPolicy: ClusterFirstrestartPolicy: AlwaysschedulerName: default-schedulersecurityContext: {}terminationGracePeriodSeconds: 30 すなわち、Replicase のマニフェストは、Deployment のSpec で提供されたもので構成されています。">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="リソースの詳細" />
 <meta property="og:description" content="" />
@@ -15,7 +21,7 @@
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.4daa2d728d66588922e8c5e27a2f7908eda33411dff532e7fc4091165c674456.js" integrity="sha256-Taotco1mWIki6MXiei95CO2jNBHf9TLn/ECRFlxnRFY=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.fe2ee694025b29c9774a5110cf59e6a42718e9cc1a2124ab4ba953ad41c55429.js" integrity="sha256-/i7mlAJbKcl3SlEQz1nmpCcY6cwaISSrS6lTrUHFVCk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -171,6 +177,24 @@ https://github.com/alex-shpak/hugo-book
   
 
   
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
     <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class=" active">リソースの詳細</a>
   
 
@@ -189,7 +213,61 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class="">基本操作</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class="">ネットワーク</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class="">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/summary/" class="">まとめ</a>
   
 
           
@@ -257,7 +335,14 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#リソース">リソース</a></li>
+    <li><a href="#deployment-replicaset">Deployment, Replicaset,</a></li>
+    <li><a href="#スケールアウト">スケールアウト</a></li>
+    <li><a href="#pod-とコンテナ">Pod とコンテナ</a>
+      <ul>
+        <li><a href="#その他のリソース">その他のリソース</a></li>
+      </ul>
+    </li>
+    <li><a href="#演習">演習</a></li>
   </ul>
 </nav>
 
@@ -270,10 +355,128 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h2 id="リソース">
-  リソース
-  <a class="anchor" href="#%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9">#</a>
+  <article class="markdown"><h2 id="deployment-replicaset">
+  Deployment, Replicaset,
+  <a class="anchor" href="#deployment-replicaset">#</a>
 </h2>
+<p>前の手順でDeployment を作成しましたが、Deployment は追加のリソースを作成します。調べてみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get all -o name -l app<span style="color:#f92672">=</span>blog
+</code></pre></div><p>all はリソース名ではなく、Kubernetesのコアのリソースタイプを表示するエイリアスです。</p>
+<p>出力は以下のようになるはずです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pod/blog-6b8999855c-6jjhj
+pod/blog-6b8999855c-zk8pg
+deployment.apps/blog
+replicaset.apps/blog-6b8999855c
+</code></pre></div><p>Deployment を作成しただけなのに、結果的にReplicaset とPod のリソースが追加で作成されています。</p>
+<p>これは、Deploymentが、Replicaset を作成するためのテンプレートとして機能するためです。また、Replicaset は、Pod を作成するためのテンプレートとして機能します。Pod は、アプリケーションのインスタンスを表すものです。このケースでは、レプリカの数が2に設定されているため、2つのPod が存在します。</p>
+<p>Replicaset のリソース定義を表示するには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get replicaset -l app<span style="color:#f92672">=</span>blog -o yaml
+</code></pre></div><pre><code>spec:
+replicas: 2
+selector:
+    matchLabels:
+    app: blog
+    pod-template-hash: &quot;896156207&quot;
+template:
+    metadata:
+    creationTimestamp: null
+    labels:
+        app: blog
+        pod-template-hash: &quot;896156207&quot;
+    spec:
+    containers:
+    - env:
+        - name: BLOG_SITE_NAME
+        value: EduK8S Blog
+        image: quay.io/eduk8s-labs/app-k8s-fundamentals-frontend:latest
+        imagePullPolicy: Always
+        name: blog
+        ports:
+        - containerPort: 8080
+        protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+    dnsPolicy: ClusterFirst
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    terminationGracePeriodSeconds: 30
+</code></pre>
+<p>すなわち、Replicase のマニフェストは、Deployment のSpec で提供されたもので構成されています。</p>
+<p>Pod のリソース定義を表示するには以下を実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pod -l app<span style="color:#f92672">=</span>blog -o yaml
+</code></pre></div><p>ここでは、Replicaset のspec.template のフィールドがPod のリソース定義の作成に使われています。</p>
+<p>Replicaset とPod の両方で、多くのフィールドが追加されていることがわかります。これは、元のDeployment では指定されていなかった値のデフォルトが記入されているためです。また、リソース定義には、リソースのステータスを追跡するためのフィールドも含まれています。</p>
+<p>継承されたデフォルトの場合、リソースの種類によって異なりますが、グローバル構成やネームスペース構成から一部が継承されている場合もあります。例えば、CPUとメモリのリソース制限は、作業しているネームスペースで設定された制限を継承しています。</p>
+<p>いずれにしても、これらのデフォルト値が正しくないことが判明し、それらを変更する必要がある場合、または追加の設定を追加する必要がある場合は、その変更をDeployment で行う必要があります。Replicaset やPod を自分で直接編集してはいけません。代わりにDeployment を更新してください。Replicaset とPod のインスタンスは、それに対応して更新されます。</p>
+<blockquote class="book-hint info">
+  Kubernetes の世界ではマニフェストがすべてです。例えばReplicaset のマニフェストを直接編集すると、それを管理するDeployment との整合性にズレが生じるため、整合性を取るようDeployment のマニフェストに従うように再構成されます。すなわち、Replicaset を編集したところで、自動的に編集前の状態に戻ります。
+</blockquote>
+
+<p>アプリケーションを削除する際には、先ほどフロントエンドのWebアプリケーションで行ったように、Replicaset もPod も明示的に削除する必要はありません。これは、Pod は作成元のReplicaset が所有するものとしてマークアップされ、Replicaset はDeployment が所有するものとしてマークされるためです。Deoloyment を削除すると、Replicaset と、そこから作成されたPod は自動的に削除されます。</p>
+<h2 id="スケールアウト">
+  スケールアウト
+  <a class="anchor" href="#%e3%82%b9%e3%82%b1%e3%83%bc%e3%83%ab%e3%82%a2%e3%82%a6%e3%83%88">#</a>
+</h2>
+<p>Pod をスケールアウトしてみましょう。先ほど説明した通り、Pod やReplicaset を編集するのではなく、Deployment のマニフェスト中のspec.replicas の値を変更する必要があります。今回は、レプリカの数を3 に増やすために、Deployment のマニフェストを更新し、再びApply してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sed -i -e <span style="color:#e6db74">&#34;s/replicas: 2/replicas: 3/&#34;</span> ~/frontend/deployment.yaml
+kubectl apply -f ~/frontend/deployment.yaml
+</code></pre></div><pre><code>kubectl get pods -l app=blog
+</code></pre>
+<p>コマンドをすぐに実行した場合、「Pending（保留）」または「ContainerCreating（コンテナ作成中）」状態のPod が表示されることがあります。これは新しいPod が起動しているところです。Running 状態のPodが3つ表示されるまで、kubectl get podsを実行し続けます。</p>
+<p>このように、非常に簡単にPod をスケールアウトさせることができました。仮想マシンの場合、通常このように即座にスケールアウトすることはできません。コンテナを利用する1 つのメリットとして、このように拡張性に非常に優れることが挙げられます。</p>
+<h2 id="pod-とコンテナ">
+  Pod とコンテナ
+  <a class="anchor" href="#pod-%e3%81%a8%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a">#</a>
+</h2>
+<p>Pod がアプリケーションのインスタンスを表すことはすでに述べたとおりです。</p>
+<p>より正確に言うと、Pod は、実行中のコンテナのグループを表す抽象的なもので、Pod はコンテナの管理およびスケーリングをするための単なるグルーピングにすぎません。</p>
+<p>ほとんどの場合、Pod は1つのコンテナのみで構成されます。1つのPod で複数のコンテナを実行するユースケースもありますが、一般的には例外的なケースです。</p>
+<p>今回のハンズオンで使用するサンプルアプリケーションを見ると、2つの別々のDeployment があります。1つはフロントエンドのWeb サーバー用、もう1つはデータベース用です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment
+</code></pre></div><pre><code>NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+blog      2/2     2            2           64s
+blog-db   1/1     1            1           34s
+</code></pre>
+<p>このようにDeployment を分けることで、フロントエンドのWebアプリケーションをデータベースとは別に複数のインスタンスにスケールアップすることができます。両方のコンポーネントが1 つのDeployment の一部として作成され、Pod の別々のコンテナで実行されていた場合、アプリケーションを複数のインスタンスにスケールアップすることはできません。これは、データベースはデータと紐づくため（＝ステートフル）、データの整合性などを気にする必要があり、Web サーバーのようなステートレスアプリケーションのようにレプリカ数を簡単に増やすことはできないからです。</p>
+<h3 id="その他のリソース">
+  その他のリソース
+  <a class="anchor" href="#%e3%81%9d%e3%81%ae%e4%bb%96%e3%81%ae%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9">#</a>
+</h3>
+<p>本ハンズオンでは紹介できませんが、Kubernetes には他にも沢山のリソースがあります。また、自分でリソースを作ることもできます。詳細はKubernetes のドキュメントを参照してください。</p>
+<p>参考 : <a href="https://kubernetes.io/docs/concepts/" target="_blank">
+    https://kubernetes.io/docs/concepts/
+</a></p>
+<h2 id="演習">
+  演習
+  <a class="anchor" href="#%e6%bc%94%e7%bf%92">#</a>
+</h2>
+<p>Deployment で管理されるPod (Deployment &gt; Replicaset &gt; Pod) を手動で削除した場合、何が起こると考えられますか？</p>
+<details ><summary>解答</summary>
+  <div class="markdown-inner">
+    <p>Deployment のマニフェストの中のReplicaset のspec でPod のレプリカ数を定義しているため、Replicaset のマニフェストと整合性を取るよう、Pod が再作成されます。確かめてみましょう。</p>
+<p>まずは今稼働しているPod を表示してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pods -l app<span style="color:#f92672">=</span>blog 
+</code></pre></div><pre><code>NAME                    READY   STATUS    RESTARTS   AGE
+blog-65c8484545-7c8qk   1/1     Running   0          20m
+blog-65c8484545-qbvvp   1/1     Running   0          20m
+</code></pre>
+<p>次に、Pod を手動で削除します。Pod 名は環境によって異なるため、先ほど表示されたもののどちらか一方を使用してください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl delete pods blog-65c8484545-7c8qk 
+</code></pre></div><p>すると、以下のように表示されるはずです。</p>
+<pre><code>pod &quot;blog-65c8484545-7c8qk&quot; deleted
+</code></pre>
+<p>しかしながら、再度稼働中のPod を表示してみると、Pod の数に変化がありません。</p>
+<pre><code>NAME                    READY   STATUS    RESTARTS   AGE
+blog-65c8484545-br9mf   1/1     Running   0          8s
+blog-65c8484545-qbvvp   1/1     Running   0          21m
+</code></pre>
+<p>これは、実際にはPod が削除された後、自動的にPod が再作成されているためです。その証拠に、先ほど削除したPod 名(この例ではblog-65c8484545-7c8qk) は存在せず、作成されたばかりの（この例ではAGE=8s）、別名のPod が表示されています。</p>
+
+  </div>
+</details>
+
 </article>
  
       
@@ -315,7 +518,14 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#リソース">リソース</a></li>
+    <li><a href="#deployment-replicaset">Deployment, Replicaset,</a></li>
+    <li><a href="#スケールアウト">スケールアウト</a></li>
+    <li><a href="#pod-とコンテナ">Pod とコンテナ</a>
+      <ul>
+        <li><a href="#その他のリソース">その他のリソース</a></li>
+      </ul>
+    </li>
+    <li><a href="#演習">演習</a></li>
   </ul>
 </nav>
 

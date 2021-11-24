@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ストレージの基本 #  繰り返しになりますが、Pod は短命です。Pod は簡単に削除されるため、データを残したい場合は何かしらの形で外部に保存する仕組みが必要です。その1 つがPersistent Volume （PV）になります。
+PV はその名の通り永続ストレージであり、PV の中にデータを保存することができます。PV をPod に割り当てるにはいくつか方法がありますが、代表的なものとしてPersistent Volume Claim (PVC) を使う方法があります。PVC はPV を要求するために使われるリソースであり、そのマニフェストの中には例えば要求するストレージのサイズなどが定義されます。Pod がデータを保存するためにPV を使いたい場合は、直接PV をアタッチするのではなく、PVC をアタッチします。
+PVC のマニフェストを見てみましょう。
+cat ~/database/persistentvolumeclaim.yaml apiVersion: v1kind: PersistentVolumeClaimmetadata:name: blog-medialabels:app: blogspec:accessModes:- ReadWriteOnceresources:requests:storage: 1Gi ここでは、ストレージのサイズは少なくとも1Giで、アクセスモードはReadWriteOnce である必要があります。アクセスモードとは、払い出すPV がどのようにRead/Write されうるかを示しており、以下の4 つがあります。
+ ReadWriteOnce(RWO) - 単一のノードからRead/Write 可能としてボリュームをマウントします。 ReadOnlyMany (ROX) - 複数のノードによって読み取り専用としてボリュームをマウントします。 ReadWriteMany (RWX) - 複数のノードによってRead/Write 可能としてボリュームをマウントします。 ReadWriteOncePod (RWOP) - 単一のPod からRead/Write 可能としてボリュームをマウントします。  なお、使用するKubernetes クラスタによってはRWX が使えないなどの制約があります。">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="ストレージとデータベース" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" />
+
+<title>ストレージとデータベース | コンテナ/Kubernetes ハンズオン</title>
+<link rel="manifest" href="/k8s-workshop/manifest.json">
+<link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
+  <script defer src="/k8s-workshop/flexsearch.min.js"></script>
+  <script defer src="/k8s-workshop/en.search.min.fe2ee694025b29c9774a5110cf59e6a42718e9cc1a2124ab4ba953ad41c55429.js" integrity="sha256-/i7mlAJbKcl3SlEQz1nmpCcY6cwaISSrS6lTrUHFVCk=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" href="/k8s-workshop/css/copy.css">
+<script defer src="/k8s-workshop/js/copy.js"></script>
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/k8s-workshop/"><span>コンテナ/Kubernetes ハンズオン</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/" class="">コンテナハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/" class="">Kubernetes ハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class="">リソースの詳細</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class="">ネットワーク</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class=" active">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/k8s-workshop/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>ストレージとデータベース</strong>
+
+  <label for="toc-control">
+    
+    <img src="/k8s-workshop/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#ストレージの基本">ストレージの基本</a></li>
+    <li><a href="#データベースとの接続">データベースとの接続</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="ストレージの基本">
+  ストレージの基本
+  <a class="anchor" href="#%e3%82%b9%e3%83%88%e3%83%ac%e3%83%bc%e3%82%b8%e3%81%ae%e5%9f%ba%e6%9c%ac">#</a>
+</h2>
+<p>繰り返しになりますが、Pod は短命です。Pod は簡単に削除されるため、データを残したい場合は何かしらの形で外部に保存する仕組みが必要です。その1 つがPersistent Volume （PV）になります。</p>
+<p>PV はその名の通り永続ストレージであり、PV の中にデータを保存することができます。PV をPod に割り当てるにはいくつか方法がありますが、代表的なものとしてPersistent Volume Claim (PVC) を使う方法があります。PVC はPV を要求するために使われるリソースであり、そのマニフェストの中には例えば要求するストレージのサイズなどが定義されます。Pod がデータを保存するためにPV を使いたい場合は、直接PV をアタッチするのではなく、PVC をアタッチします。</p>
+<p>PVC のマニフェストを見てみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat ~/database/persistentvolumeclaim.yaml
+</code></pre></div><pre><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blog-media
+  labels:
+    app: blog
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+</code></pre>
+<p>ここでは、ストレージのサイズは少なくとも1Giで、アクセスモードはReadWriteOnce である必要があります。アクセスモードとは、払い出すPV がどのようにRead/Write されうるかを示しており、以下の4 つがあります。</p>
+<ul>
+<li>ReadWriteOnce(RWO) - 単一のノードからRead/Write 可能としてボリュームをマウントします。</li>
+<li>ReadOnlyMany (ROX) - 複数のノードによって読み取り専用としてボリュームをマウントします。</li>
+<li>ReadWriteMany (RWX) - 複数のノードによってRead/Write 可能としてボリュームをマウントします。</li>
+<li>ReadWriteOncePod (RWOP) - 単一のPod からRead/Write 可能としてボリュームをマウントします。</li>
+</ul>
+<p>なお、使用するKubernetes クラスタによってはRWX が使えないなどの制約があります。</p>
+<blockquote class="book-hint info">
+  RWO, ROX, RWX のアクセス元はいずれも&quot;ノード&quot;であることに注意してください。すなわち、RWO を選択したとしても、複数のPod が同一ノード上で稼働していれば、そのPV にはアクセスが可能です。
+</blockquote>
+
+<p>既に作成したデータベースのマニフェストを見てみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat ~/database/deployment.yaml
+</code></pre></div><pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-db
+  labels:
+    app: blog-db
+spec:
+  ...
+  template:
+    ...
+    spec:
+      containers:
+      ...
+        volumeMounts:
+        - name: data
+          mountPath: &quot;/var/lib/pgsql/data&quot;
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: blog-database
+</code></pre>
+<p>spec.template.spec.volumes に使用するPVC のリソースオブジェクト名が記載され、その請求されるPV がdata と名付けられ、さらにそれがspec.template.spec.containers[*].volumeMounts にてコンテナのパス/var/lib/pgsql/data にマウントされていることが分かります。
+<blockquote class="book-hint info">
+  フロントのWeb サーバーにもPV がマウントされていますが、これはブログの記事ではなく画像を保存するためのものです。
+</blockquote>
+</p>
+<details ><summary>補足</summary>
+  <div class="markdown-inner">
+    今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から画像を保存するPV にアクセスさせることを可能にしたいため、厳密にいえばReadWriteMany のPV を使うべきですが、環境に寄ってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnceのストレージで十分です。
+  </div>
+</details>
+
+<h2 id="データベースとの接続">
+  データベースとの接続
+  <a class="anchor" href="#%e3%83%87%e3%83%bc%e3%82%bf%e3%83%99%e3%83%bc%e3%82%b9%e3%81%a8%e3%81%ae%e6%8e%a5%e7%b6%9a">#</a>
+</h2>
+<p>フロントエンドのWebアプリケーションが動作しており、公共のインターネットからアクセスできます。この時点では、ファイルベースのSQLiteデータベースを使用しています。このデータベースは各インスタンスに対してローカルであり、すべてのインスタンス間で共有されていないため（スケールアップしたアプリケーションには不向き）、ポッドが再起動するたびにデータへの変更が失われます。</p>
+<p>データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働している別のPostgresqlデータベースを使用するように設定します。</p>
+<p>データベースのリソースを表示するには、以下を実行します。</p>
+<p>kubectl get deployment,service,pvc,secret -l app=blog-db -o name</p>
+<pre><code>deployment.apps/blog-db
+service/blog-db
+persistentvolumeclaim/blog-database
+secret/blog-credentials
+</code></pre>
+<p>これで、デプロイメントとサービスの目的が理解できたはずです。persistentvolumeclaim は、データベースが使用する永続的なストレージを要求するために使用されます。secret は、データベースの認証情報を保持するために使用されます。</p>
+<p>データベースをフロントエンドのウェブアプリケーションにリンクさせるためには、フロントエンドのウェブアプリケーションにデータベースのホスト名とログイン認証情報を伝える必要があります。そのためには、フロントエンド Web アプリケーションの配置に環境変数の設定を追加する必要があります。</p>
+<p>フロントエンドWebアプリケーションにどのような環境変数がすでに設定されているかは、次のように実行すればわかります。</p>
+<p>kubectl set env deployment/blog &ndash;list
+これで表示されるはずです。</p>
+<h1 id="デプロイメントブログコンテナブログ">
+  デプロイメントブログ、コンテナブログ
+  <a class="anchor" href="#%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%83%a1%e3%83%b3%e3%83%88%e3%83%96%e3%83%ad%e3%82%b0%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%83%96%e3%83%ad%e3%82%b0">#</a>
+</h1>
+<p>BLOG_SITE_NAME=EduK8Sブログ
+フロントエンドWebアプリケーションの実装方法では、別のデータベースのために以下の環境変数を期待しています。</p>
+<p>DATABASE_HOST - データベースのホスト名です。
+DATABASE_USER - データベースにログインするユーザーです。
+DATABASE_PASSWORD - データベースにログインするユーザーのパスワードです。
+DATABASE_NAME - データベースの名前です。
+環境変数を設定するために、kubectlにはkubectl set envというコマンドが用意されています。本番の設定を更新するのではなく、ローカルに設定を保持するのですが、その設定に必要な変更を行うために使用します。</p>
+<p>データベースホストについては、ホスト名はデータベースサービスオブジェクトの名前、つまりblog-dbとなります。</p>
+<p>このセットでデプロイメント構成がどうなるかを確認するには、次のように実行します。</p>
+<p>kubectl set env deployment/blog DATABASE_HOST=blog-db &ndash;dry-run -o yaml
+出力結果を見ると、既存のBLOG_SITE_NAME環境変数に加えて、DATABASE_HOST環境変数が追加されていることがわかります。これは、spec.template.spec.container.envの設定の下にあります。</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#ストレージの基本">ストレージの基本</a></li>
+    <li><a href="#データベースとの接続">データベースとの接続</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
