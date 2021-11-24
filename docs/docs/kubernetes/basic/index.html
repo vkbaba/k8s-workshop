@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="クラスタへのアクセス #  これから行うハンズオンでは、kubectl CLIを使用してKubernetesとやり取りします。このCLI は、ワークショップ環境の「ターミナル」タブからアクセスできるインタラクティブなターミナルセッションで提供されます。ご自身のコンピュータに何かをインストールする必要はありません。ここでは、Webブラウザを使ってすべての操作を行うことになります。使用するKubernetesクラスタにはすでに接続されているので、ログインする必要はありません。
+ワークショップ環境では、KubernetesクラスタをWebベースで確認することもできます。これは、ワークショップ環境の「コンソール」タブから利用できます。これは、ハンズオンで行うことの結果を視覚的に確認するために含まれていますが、ハンズオンはこれに依存しません。
+ハンズオンを続ける前に、kubectlコマンドが実行され、ワークショップ環境も機能していることを確認します。これを行うには、次のように実行します。
+kubectl version 実行すると、次のような出力が表示されます。
+Client Version: version.Info{Major:&quot;1&quot;, Minor:&quot;17&quot;, GitVersion:&quot;v1.17.0&quot;, GitCommit:&quot;70132b0f130acc0bed193d9ba59dd186f0e634cf&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-12-07T21:20:10Z&quot;, GoVersion:&quot;go1.13.4&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;}Server Version: version.Info{Major:&quot;1&quot;, Minor:&quot;17&quot;, GitVersion:&quot;v1.17.0&quot;, GitCommit:&quot;70132b0f130acc0bed193d9ba59dd186f0e634cf&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-12-07T21:12:17Z&quot;, GoVersion:&quot;go1.13.4&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;} 使用しているKubernetesのバージョンは、ここで示したバージョンと異なる場合があります。
+アプリケーションのデプロイ #  さて、Kubernetesクラスタへのアクセスが正常に行われていることを確認したら、早速、ブログサイトを実装したフロントエンドのWebアプリケーションと、ブログ記事を保存するためのPostgreSQLデータベースで構成される完全なアプリケーションをデプロイしてみましょう。
+これは、すでに構成ができていれば、Kubernetesに完全なアプリケーションをいかに早くデプロイできるかを示すためです。アプリケーション全体がデプロイされたら、フロントエンドのWebアプリケーションコンポーネントを削除し、段階的にデプロイし直すことで、どのように組み合わされているのか、どのようにKubernetesを使用しているのかを確認することができます。
+デプロイしたいアプリケーションの最初の部分は、PostgreSQLデータベースです。これをデプロイするためのリソースファイル一式は、databaseディレクトリにあります。
+ls -las database/ このディレクトリ内の各ファイルには、アプリケーションコンポーネントの配置を構成するための異なるリソース定義が含まれています。
+各ファイルの定義を調べるよりも、まずはディレクトリ内のリソースをKubernetes に処理させてみましょう。これを行うには、次のように実行します。
+kubectl apply -f database/ --dry-run これで出力されるはずです。
+secret/blog-credentials created (dry run)service/blog-db created (dry run)persistentvolumeclaim/blog-database created (dry run)deployment.apps/blog-db created (dry run) 今回のkubectl applyコマンドは、設定ファイルやディレクトリに含まれるファイル群からリソースを作成するためのものです。ここでは&ndash;dry-runオプションを使い、クラスタ内のオブジェクトを一切作成せずに、どのようなオブジェクトを作成するかを指示しています。また、&ndash;dry-runオプションはリソースの定義を検証し、エラーがある場合は警告します。">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="基本操作" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" />
+
+<title>基本操作 | コンテナ/Kubernetes ハンズオン</title>
+<link rel="manifest" href="/k8s-workshop/manifest.json">
+<link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
+  <script defer src="/k8s-workshop/flexsearch.min.js"></script>
+  <script defer src="/k8s-workshop/en.search.min.4daa2d728d66588922e8c5e27a2f7908eda33411dff532e7fc4091165c674456.js" integrity="sha256-Taotco1mWIki6MXiei95CO2jNBHf9TLn/ECRFlxnRFY=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" href="/k8s-workshop/css/copy.css">
+<script defer src="/k8s-workshop/js/copy.js"></script>
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/k8s-workshop/"><span>コンテナ/Kubernetes ハンズオン</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/" class="">コンテナハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/" class="">Kubernetes ハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class="">リソースの詳細</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class=" active">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/k8s-workshop/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>基本操作</strong>
+
+  <label for="toc-control">
+    
+    <img src="/k8s-workshop/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#クラスタへのアクセス">クラスタへのアクセス</a></li>
+    <li><a href="#アプリケーションのデプロイ">アプリケーションのデプロイ</a></li>
+    <li><a href="#デプロイしたアプリケーションへのアクセス">デプロイしたアプリケーションへのアクセス</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="クラスタへのアクセス">
+  クラスタへのアクセス
+  <a class="anchor" href="#%e3%82%af%e3%83%a9%e3%82%b9%e3%82%bf%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9">#</a>
+</h2>
+<p>これから行うハンズオンでは、kubectl CLIを使用してKubernetesとやり取りします。このCLI は、ワークショップ環境の「ターミナル」タブからアクセスできるインタラクティブなターミナルセッションで提供されます。ご自身のコンピュータに何かをインストールする必要はありません。ここでは、Webブラウザを使ってすべての操作を行うことになります。使用するKubernetesクラスタにはすでに接続されているので、ログインする必要はありません。</p>
+<p>ワークショップ環境では、KubernetesクラスタをWebベースで確認することもできます。これは、ワークショップ環境の「コンソール」タブから利用できます。これは、ハンズオンで行うことの結果を視覚的に確認するために含まれていますが、ハンズオンはこれに依存しません。</p>
+<p>ハンズオンを続ける前に、kubectlコマンドが実行され、ワークショップ環境も機能していることを確認します。これを行うには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl version
+</code></pre></div><p>実行すると、次のような出力が表示されます。</p>
+<pre><code>Client Version: version.Info{Major:&quot;1&quot;, Minor:&quot;17&quot;, GitVersion:&quot;v1.17.0&quot;, GitCommit:&quot;70132b0f130acc0bed193d9
+ba59dd186f0e634cf&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-12-07T21:20:10Z&quot;, GoVersion:&quot;go1.13.4&quot;, Compiler:&quot;
+gc&quot;, Platform:&quot;linux/amd64&quot;}
+Server Version: version.Info{Major:&quot;1&quot;, Minor:&quot;17&quot;, GitVersion:&quot;v1.17.0&quot;, GitCommit:&quot;70132b0f130acc0bed193d9
+ba59dd186f0e634cf&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-12-07T21:12:17Z&quot;, GoVersion:&quot;go1.13.4&quot;, Compiler:&quot;
+gc&quot;, Platform:&quot;linux/amd64&quot;}
+</code></pre>
+<p>使用しているKubernetesのバージョンは、ここで示したバージョンと異なる場合があります。</p>
+<h2 id="アプリケーションのデプロイ">
+  アプリケーションのデプロイ
+  <a class="anchor" href="#%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%ae%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4">#</a>
+</h2>
+<p>さて、Kubernetesクラスタへのアクセスが正常に行われていることを確認したら、早速、ブログサイトを実装したフロントエンドのWebアプリケーションと、ブログ記事を保存するためのPostgreSQLデータベースで構成される完全なアプリケーションをデプロイしてみましょう。</p>
+<p>これは、すでに構成ができていれば、Kubernetesに完全なアプリケーションをいかに早くデプロイできるかを示すためです。アプリケーション全体がデプロイされたら、フロントエンドのWebアプリケーションコンポーネントを削除し、段階的にデプロイし直すことで、どのように組み合わされているのか、どのようにKubernetesを使用しているのかを確認することができます。</p>
+<p>デプロイしたいアプリケーションの最初の部分は、PostgreSQLデータベースです。これをデプロイするためのリソースファイル一式は、databaseディレクトリにあります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">ls -las database/
+</code></pre></div><p>このディレクトリ内の各ファイルには、アプリケーションコンポーネントの配置を構成するための異なるリソース定義が含まれています。</p>
+<p>各ファイルの定義を調べるよりも、まずはディレクトリ内のリソースをKubernetes に処理させてみましょう。これを行うには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl apply -f database/ --dry-run
+</code></pre></div><p>これで出力されるはずです。</p>
+<pre><code>secret/blog-credentials created (dry run)
+service/blog-db created (dry run)
+persistentvolumeclaim/blog-database created (dry run)
+deployment.apps/blog-db created (dry run)
+</code></pre>
+<p>今回のkubectl applyコマンドは、設定ファイルやディレクトリに含まれるファイル群からリソースを作成するためのものです。ここでは&ndash;dry-runオプションを使い、クラスタ内のオブジェクトを一切作成せずに、どのようなオブジェクトを作成するかを指示しています。また、&ndash;dry-runオプションはリソースの定義を検証し、エラーがある場合は警告します。</p>
+<p>あるコマンドが何をするのか、どんなオプションを受け付けるのかが不明な場合は、&ndash;helpオプションを付けて実行することができます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl apply --help
+</code></pre></div><p>ドライランデプロイメントを行うことで、作成されるリソースを確認することができました。実際にデータベースコンポーネントをデプロイするために、今度は次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl apply -f database/
+</code></pre></div><p>ドライランの時と同様に、kubectl applyはリソースをリストアップしますが、今回は実際にリソースが作成されます。</p>
+<pre><code>secret/blog-credentials created
+service/blog-db created
+persistentvolumeclaim/blog-database created
+deployment.apps/blog-db created
+</code></pre>
+<p>このリストの中で重要なリソースはdeployment です。deployment では、アプリケーションにデプロイするコンテナイメージの名前、起動するインスタンスの数、デプロイメントの管理方法などを指定します。</p>
+<p>デプロイの進捗を監視し、完了を知るには、次のコマンドを実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl rollout status deployment/blog-db
+</code></pre></div><p>引数には、リソースのタイプとこのインスタンスの名前を含む、リソースのフルネームを指定します。この場合、インスタンスはblog-dbという名前でした。</p>
+<p>データベースがデプロイされたので、今度はフロントエンドのWebアプリケーションを次のように実行してデプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl apply -f frontend/ 
+</code></pre></div><p>出力は以下のようになるはずです。</p>
+<pre><code>persistentvolumeclaim/blog-media created
+deployment.apps/blog created
+service/blog created
+ingress.extensions/blog created
+</code></pre>
+<p>以下を実行して監視し、デプロイが完了するのを待ちます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl rollout status deployment/blog
+</code></pre></div><h2 id="デプロイしたアプリケーションへのアクセス">
+  デプロイしたアプリケーションへのアクセス
+  <a class="anchor" href="#%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%97%e3%81%9f%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9">#</a>
+</h2>
+<p>フロントエンドのWebアプリケーション用にingressオブジェクトが作成されていることに注目してください。このオブジェクトは、アクセス可能なURLを払い出し、Webアプリケーションへのアクセスを設定します。</p>
+<p>この例では、WebアプリケーションにアクセスするためのURLは次のようになります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">NS<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>kubectl config view -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.contexts[].context.namespace}&#39;</span><span style="color:#66d9ef">)</span>
+http://<span style="color:#e6db74">${</span>NS<span style="color:#e6db74">}</span>.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+</code></pre></div><p>{{hint info}}
+1つ目のコマンドはこの環境で払い出されるURL 名の一部を取得しています。
+{{/hint}}</p>
+<p>このリンクをクリックして、フロントエンドのWebアプリケーションにアクセスします。利用できないと表示された場合は、利用できるようになるまでページを更新してください。これは、Ingress の設定に時間がかかる場合があるためです。</p>
+<p>まだ、ブログ記事は表示されません。データベースの設定と入力については後ほど説明します。</p>
+<p>KubernetesクラスタのWebコンソールを使用すると、どのリソースが作成されているか、またそれらのリソース間の関係をブラウザで視覚的に表示することができますが、ほとんどの開発者はkubectlを使用してコマンドラインからKubernetesクラスタを操作します。</p>
+<p>現在の名前空間にある、すでに作成されたすべてのデプロイメントの一覧を表示するには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment
+</code></pre></div><p>出力は以下のようになるはずです。</p>
+<pre><code>NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+blog      2/2     2            2           5m
+blog-db   1/1     1            1           5m
+</code></pre>
+<p>特定のリソースに絞り込みたい場合は、コマンドにそのリソース名を加えることができます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment/blog
+</code></pre></div><p>これで、1つのリソースだけの出力が得られるはずです。もしくは、以下のように実行することもできます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment blog
+</code></pre></div><p>出力の最初の部分は以下のようになるはずです。</p>
+<pre><code>Name:                   blog
+Namespace:              lab-k8s-fundamentals-user1
+CreationTimestamp:      Tue, 04 Feb 2020 03:06:56 +0000
+Labels:                 app=blog
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=blog
+Replicas:               2 desired | 2 updated | 2 total | 2 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+    ....
+</code></pre>
+<p>これは比較的読みやすい形式にしたものであり、生のリソース定義を見るには、kubectl getの-o yaml表示出力オプションを使います。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment/blog -o yaml
+</code></pre></div><p>また、YAMLではなくJSONで作業をしたい場合には以下を実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment/blog -o json
+</code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#クラスタへのアクセス">クラスタへのアクセス</a></li>
+    <li><a href="#アプリケーションのデプロイ">アプリケーションのデプロイ</a></li>
+    <li><a href="#デプロイしたアプリケーションへのアクセス">デプロイしたアプリケーションへのアクセス</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

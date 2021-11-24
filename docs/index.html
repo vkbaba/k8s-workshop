@@ -10,7 +10,7 @@ https://tanzu.vmware.com/developer/workshops/
 https://customerconnect.vmware.com/jp/account-registration
 前半はContainer Basics、 後半はKubernetes Fundamentals のコースを選択します。
 諸注意 #  本ハンズオンは基本的にハンズオン中のマニュアルの日本語訳となっていますが、解説を加えたり、一部効率化するために手順が異なる場合があります。
-ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。
+ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。 Invalid session name supplied
 しばらく操作をしないとラボから自動的に切断されますので、その場合は画面を更新してください。">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="はじめに" />
@@ -23,12 +23,13 @@ https://customerconnect.vmware.com/jp/account-registration
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.926e46789b91eac4f7975381248c7eaa86e382ef90ff32a8728fed49fc015b86.js" integrity="sha256-km5GeJuR6sT3l1OBJIx&#43;qobjgu&#43;Q/zKoco/tSfwBW4Y=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.4daa2d728d66588922e8c5e27a2f7908eda33411dff532e7fc4091165c674456.js" integrity="sha256-Taotco1mWIki6MXiei95CO2jNBHf9TLn/ECRFlxnRFY=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
 -->
-  
+  <link rel="stylesheet" href="/k8s-workshop/css/copy.css">
+<script defer src="/k8s-workshop/js/copy.js"></script>
 </head>
 <body dir="ltr">
   <input type="checkbox" class="hidden toggle" id="menu-control" />
@@ -158,6 +159,60 @@ https://github.com/alex-shpak/hugo-book
         </li>
       
     
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/" class="">Kubernetes ハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class="">リソースの詳細</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
   </ul>
 
 
@@ -229,16 +284,21 @@ https://github.com/alex-shpak/hugo-book
   <a class="anchor" href="#%e7%92%b0%e5%a2%83%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9%e6%96%b9%e6%b3%95">#</a>
 </h2>
 <p>本ハンズオンはTanzu Workshop の環境を使います。<br>
-<a href="https://tanzu.vmware.com/developer/workshops/">https://tanzu.vmware.com/developer/workshops/</a></p>
+<a href="https://tanzu.vmware.com/developer/workshops/" target="_blank">
+    https://tanzu.vmware.com/developer/workshops/
+</a></p>
 <p>ハンズオンを実施するにはCustomer Connect (旧My VMware) またはgithub のアカウントが必要なので、あらかじめ作成しておきます。</p>
-<p><a href="https://customerconnect.vmware.com/jp/account-registration">https://customerconnect.vmware.com/jp/account-registration</a></p>
+<p><a href="https://customerconnect.vmware.com/jp/account-registration" target="_blank">
+    https://customerconnect.vmware.com/jp/account-registration
+</a></p>
 <p>前半はContainer Basics、 後半はKubernetes Fundamentals のコースを選択します。</p>
 <h2 id="諸注意">
   諸注意
   <a class="anchor" href="#%e8%ab%b8%e6%b3%a8%e6%84%8f">#</a>
 </h2>
 <p>本ハンズオンは基本的にハンズオン中のマニュアルの日本語訳となっていますが、解説を加えたり、一部効率化するために手順が異なる場合があります。</p>
-<p>ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。</p>
+<p>ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。
+Invalid session name supplied</p>
 <p>しばらく操作をしないとラボから自動的に切断されますので、その場合は画面を更新してください。</p>
 </article>
  
@@ -296,6 +356,7 @@ https://github.com/alex-shpak/hugo-book
   
 </body>
 </html>
+
 
 
 
