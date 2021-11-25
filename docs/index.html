@@ -4,14 +4,13 @@
 	<meta name="generator" content="Hugo 0.89.4" />
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="環境へのアクセス方法 #  本ハンズオンはTanzu Workshop の環境を使います。
+<meta name="description" content="はじめに #  本ハンズオンはDocker およびKubernetes について学習することを目的としております。 それぞれのラボは独立しており、どちらか一方だけを実施することも、両方実施することも可能です。
+本ハンズオンの対象 #  これからDocker やKubernetes の学習を始める方
+時間 #  Appendix を除けば、Docker ハンズオンは30 分、Kubernetes ハンズオンは1 時間、計1.5 時間程度です。
+準備するもの #   インターネットに接続できるPC （仮想マシン可）  ブラウザでハンズオン環境にアクセスするため、ハンズオンの受講にあたりDocker やKubectl などのインストールは不要です。   Chrome またはFirefox ブラウザ（IE は不可） VMware Customer Connect (旧My VMware) またはGithub のアカウント  Customer Connect のアカウントの作成方法 https://customerconnect.vmware.com/jp/account-registration    ラボへのアクセス方法 #  本ハンズオンはTanzu Workshop の環境を使います。
 https://tanzu.vmware.com/developer/workshops/
-ハンズオンを実施するにはCustomer Connect (旧My VMware) またはgithub のアカウントが必要なので、あらかじめ作成しておきます。
-https://customerconnect.vmware.com/jp/account-registration
-前半はContainer Basics、 後半はKubernetes Fundamentals のコースを選択します。
-諸注意 #  本ハンズオンは基本的にハンズオン中のマニュアルの日本語訳となっていますが、解説を加えたり、一部効率化するために手順が異なる場合があります。
-ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。 Invalid session name supplied
-しばらく操作をしないとラボから自動的に切断されますので、その場合は画面を更新してください。">
+様々なラボにアクセスすることができますが、本ハンズオンではContainer Basics およびKubernetes Fundamentals のラボを使用します。
+一般的なラボ操作 #  ラボのイメージは以下の通りです。  画面右側のターミナルでコンテナやKubernetes の操作をしていきます。 ラボのマニュアル使わないため閉じることができます。 ターミナルは2 つ提供されていますが、適宜ラボの指示に従い使い分けてください。">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="はじめに" />
 <meta property="og:description" content="" />
@@ -23,7 +22,7 @@ https://customerconnect.vmware.com/jp/account-registration
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -107,7 +106,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class="">Web サーバーの実行</a>
   
 
           
@@ -125,7 +124,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">コンテナイメージ</a>
   
 
           
@@ -337,8 +336,14 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#環境へのアクセス方法">環境へのアクセス方法</a></li>
-    <li><a href="#諸注意">諸注意</a></li>
+    <li><a href="#はじめに">はじめに</a></li>
+    <li><a href="#本ハンズオンの対象">本ハンズオンの対象</a></li>
+    <li><a href="#時間">時間</a></li>
+    <li><a href="#準備するもの">準備するもの</a></li>
+    <li><a href="#ラボへのアクセス方法">ラボへのアクセス方法</a></li>
+    <li><a href="#一般的なラボ操作">一般的なラボ操作</a></li>
+    <li><a href="#本マニュアルの使い方">本マニュアルの使い方</a></li>
+    <li><a href="#注意事項">注意事項</a></li>
   </ul>
 </nav>
 
@@ -351,27 +356,99 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h2 id="環境へのアクセス方法">
-  環境へのアクセス方法
-  <a class="anchor" href="#%e7%92%b0%e5%a2%83%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9%e6%96%b9%e6%b3%95">#</a>
+  <article class="markdown"><h2 id="はじめに">
+  はじめに
+  <a class="anchor" href="#%e3%81%af%e3%81%98%e3%82%81%e3%81%ab">#</a>
 </h2>
-<p>本ハンズオンはTanzu Workshop の環境を使います。<br>
-<a href="https://tanzu.vmware.com/developer/workshops/" target="_blank">
+<p>本ハンズオンはDocker およびKubernetes について学習することを目的としております。
+それぞれのラボは独立しており、どちらか一方だけを実施することも、両方実施することも可能です。</p>
+<h2 id="本ハンズオンの対象">
+  本ハンズオンの対象
+  <a class="anchor" href="#%e6%9c%ac%e3%83%8f%e3%83%b3%e3%82%ba%e3%82%aa%e3%83%b3%e3%81%ae%e5%af%be%e8%b1%a1">#</a>
+</h2>
+<p>これからDocker やKubernetes の学習を始める方</p>
+<h2 id="時間">
+  時間
+  <a class="anchor" href="#%e6%99%82%e9%96%93">#</a>
+</h2>
+<p>Appendix を除けば、Docker ハンズオンは30 分、Kubernetes ハンズオンは1 時間、計1.5 時間程度です。</p>
+<h2 id="準備するもの">
+  準備するもの
+  <a class="anchor" href="#%e6%ba%96%e5%82%99%e3%81%99%e3%82%8b%e3%82%82%e3%81%ae">#</a>
+</h2>
+<ul>
+<li>インターネットに接続できるPC （仮想マシン可）
+<ul>
+<li>ブラウザでハンズオン環境にアクセスするため、ハンズオンの受講にあたりDocker やKubectl などのインストールは不要です。</li>
+</ul>
+</li>
+<li>Chrome またはFirefox ブラウザ（IE は不可）</li>
+<li>VMware Customer Connect (旧My VMware) またはGithub のアカウント
+<ul>
+<li>Customer Connect のアカウントの作成方法</li>
+<li><a href="https://customerconnect.vmware.com/jp/account-registration" target="_blank">
+    https://customerconnect.vmware.com/jp/account-registration
+</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="ラボへのアクセス方法">
+  ラボへのアクセス方法
+  <a class="anchor" href="#%e3%83%a9%e3%83%9c%e3%81%b8%e3%81%ae%e3%82%a2%e3%82%af%e3%82%bb%e3%82%b9%e6%96%b9%e6%b3%95">#</a>
+</h2>
+<p>本ハンズオンはTanzu Workshop の環境を使います。</p>
+<p><a href="https://tanzu.vmware.com/developer/workshops/" target="_blank">
     https://tanzu.vmware.com/developer/workshops/
 </a></p>
-<p>ハンズオンを実施するにはCustomer Connect (旧My VMware) またはgithub のアカウントが必要なので、あらかじめ作成しておきます。</p>
-<p><a href="https://customerconnect.vmware.com/jp/account-registration" target="_blank">
-    https://customerconnect.vmware.com/jp/account-registration
-</a></p>
-<p>前半はContainer Basics、 後半はKubernetes Fundamentals のコースを選択します。</p>
-<h2 id="諸注意">
-  諸注意
-  <a class="anchor" href="#%e8%ab%b8%e6%b3%a8%e6%84%8f">#</a>
+<p>様々なラボにアクセスすることができますが、本ハンズオンではContainer Basics およびKubernetes Fundamentals のラボを使用します。</p>
+<h2 id="一般的なラボ操作">
+  一般的なラボ操作
+  <a class="anchor" href="#%e4%b8%80%e8%88%ac%e7%9a%84%e3%81%aa%e3%83%a9%e3%83%9c%e6%93%8d%e4%bd%9c">#</a>
 </h2>
-<p>本ハンズオンは基本的にハンズオン中のマニュアルの日本語訳となっていますが、解説を加えたり、一部効率化するために手順が異なる場合があります。</p>
-<p>ラボにアクセスする際、エラーでラボが立ち上がらない場合があります。その際はラボを一旦閉じて、再度アクセスします。何回か繰り返してもラボにアクセスできない場合は講師に教えてください。
-Invalid session name supplied</p>
-<p>しばらく操作をしないとラボから自動的に切断されますので、その場合は画面を更新してください。</p>
+<p>ラボのイメージは以下の通りです。
+<figure><img src="lab_screen.png" width="100%"style="display: block; margin: auto;"/>
+</figure>
+画面右側のターミナルでコンテナやKubernetes の操作をしていきます。
+ラボのマニュアル使わないため閉じることができます。
+ターミナルは2 つ提供されていますが、適宜ラボの指示に従い使い分けてください。</p>
+<h2 id="本マニュアルの使い方">
+  本マニュアルの使い方
+  <a class="anchor" href="#%e6%9c%ac%e3%83%9e%e3%83%8b%e3%83%a5%e3%82%a2%e3%83%ab%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9">#</a>
+</h2>
+<p>本マニュアルはコンテナハンズオン、Kubernetes ハンズオンの2 部構成となっています。
+それぞれのラボは独立しており、どちらか一方だけを実施することも、両方実施することも可能です。</p>
+<p>ラボの流れとしては、適宜解説を読みつつ、ターミナルにコマンドを入力していきます。</p>
+<p>以下の通り、コピーボタン📋 が表示されているコマンドは順番にターミナルに入力してください（一部URL はブラウザに直接入力します）。コピーボタン📋 をクリックするとクリップボードにコマンドがコピーされますので、ターミナル上で右クリック→貼り付け でコマンドを入力してください。
+<blockquote class="book-hint warning">
+  Ctrl + v のようなショートカットは使えません。
+</blockquote>
+</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">date
+</code></pre></div><figure><img src="date.png" width="75%"style="display: block; margin: auto;"/>
+</figure>
+<p>一方で、単なる画面の出力に関しては以下の通りコピーボタンなしで表記しています。</p>
+<pre><code>これは
+ターミナルに
+入力する必要は
+ありません
+</code></pre>
+<p>その他、一部ラボには演習を含みます。必要に応じてチャレンジしてみてください。</p>
+<h2 id="注意事項">
+  注意事項
+  <a class="anchor" href="#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a0%85">#</a>
+</h2>
+<ul>
+<li>本ハンズオンはラボで展開されるマニュアルをベースに、解説を加えたり、一部効率化するために手順が異なる場合があります。したがって、ラボのマニュアルは使用せず、本マニュアルをご利用ください。</li>
+<li><strong>ラボにアクセスする際、「Invalid session name supplied」などのエラーでラボが立ち上がらない場合があります。その際はブラウザの戻るボタンをクリックし、再度アクセスします。ラボは1 分程度で立ち上がるはずです。</strong></li>
+<li>しばらく操作をしないとラボから自動的に切断されますので、その場合はラボ画面更新ボタンをクリックしてください。
+<figure><img src="screen_update.png" width="75%"style="display: block; margin: auto;"/>
+</figure></li>
+<li>ラボの時間制限がありますので、時間が無くなってきたら延長します。
+<blockquote class="book-hint warning">
+  ボタンが赤くなる（残り時間が少なくなる）まで延長できないことに注意してください。
+</blockquote>
+</li>
+</ul>
 </article>
  
       
@@ -413,8 +490,14 @@ Invalid session name supplied</p>
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#環境へのアクセス方法">環境へのアクセス方法</a></li>
-    <li><a href="#諸注意">諸注意</a></li>
+    <li><a href="#はじめに">はじめに</a></li>
+    <li><a href="#本ハンズオンの対象">本ハンズオンの対象</a></li>
+    <li><a href="#時間">時間</a></li>
+    <li><a href="#準備するもの">準備するもの</a></li>
+    <li><a href="#ラボへのアクセス方法">ラボへのアクセス方法</a></li>
+    <li><a href="#一般的なラボ操作">一般的なラボ操作</a></li>
+    <li><a href="#本マニュアルの使い方">本マニュアルの使い方</a></li>
+    <li><a href="#注意事項">注意事項</a></li>
   </ul>
 </nav>
 

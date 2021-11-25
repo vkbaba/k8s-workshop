@@ -3,43 +3,29 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="イメージとは #  コンテナイメージから実行中のコンテナを作成しました。使用したコンテナイメージは、イメージレジストリから取得したものです。一般的に使用されているソフトウェアアプリケーション用のコンテナイメージは数多くありますが、自分のアプリケーション用にコンテナイメージを作成することの方が多いでしょう。
-コンテナイメージとは、アプリケーションを配布するためのパッケージメカニズムであり、アプリケーションの実行に必要なアプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他のソフトウェアを含んでいると説明しました。
-その意味では、コンテナイメージは、ファイルシステムを構成するために解凍されるtarballやzipファイルのようなものだと言えます。しかし、それよりも少し複雑です。
-コンテナイメージは、すべての必要なファイルを含む単一のパッケージではなく、パッケージの集合体であり、それぞれがコンテナイメージの1つのレイヤーのファイルを含んでいます。
-コンテナイメージのレイヤー
-各コンテナイメージは、まずベースレイヤーから始まります。ベースレイヤーには、通常、ベースとなるOSファイル、アプリケーション、ライブラリがすべて含まれています。
-その上にさらにレイヤーを追加していきます。各レイヤーでは、ファイルを追加したり、既存のファイルを変更したり、ファイルを削除したりします。
-既存のファイルを修正したり削除したりする場合、変更されるのは下位レイヤーのオリジナルファイルではありません。修正の場合は、変更を加えたファイルの新しいコピーが新しいレイヤーに存在し、下のレイヤーのオリジナルはそのまま存在します。ファイルの削除の場合は、そのレイヤーでファイルが削除されたことがレイヤーのメタデータに記録され、オリジナルは下のレイヤーに残っています。
-このように変更や削除が行われるのは、各レイヤーが不変であるためです。変更を加えるには、新しいレイヤーを作成するしかありません。
-コンテナイメージを使用してコンテナを作成する場合は、コンテナイメージの各レイヤーを重ね合わせてレイヤーを合成して表示する特殊なファイルシステムが使用されます。
-読み取り専用ファイルシステム
-この最終的なコンポジットビューは、それ自体が読み取り専用である。コンテナ内のファイルに加えられた変更は、コンテナの寿命まで存在する別のレイヤに存在することになる。
-コンテナのイメージフォーマットの実際の仕様は、OCI Image Format Specification で定義されています。また、コンテナ内でアプリケーションを実行するために、イメージをどのようにアンパックし、解釈し、使用するかは、OCI Runtime Specificationで定義されています。どちらの仕様も、Linux FoundationがスポンサーとなっているOpen Container Initiative のガバナンスの下で管理されています。
-イメージのビルド #  コンテナイメージを構築するには、主に3つの方法があります。
-  既存のイメージを使ってコンテナを起動し、コンテナに変更を加え、その結果を新しいコンテナイメージとして保存することで、インタラクティブにイメージを構築する方法。
-  入力ファイルに記述されたスクリプトを使って、バッチプロセスでコンテナイメージを作成する。典型的な例としては、Dockerfileを使用してコンテナイメージを作成することが挙げられる。
-  tarballからファイルシステムのコピーをインポートしてコンテナイメージを作成する。
-  このワークショップでは、典型的な手法である2 つめのDockerfile を用いた方法を見ていきます。
+<meta name="description" content="本セクションで学習すること #   コンテナイメージの概要 Dockerfile を使ったコンテナイメージの作成 イメージレジストリを使ったコンテナイメージの共有  コンテナイメージとは #  コンテナイメージから実行中のコンテナを作成しました。使用したコンテナイメージは、イメージレジストリから取得したものです。一般的に使用されているソフトウェアアプリケーション用のコンテナイメージは数多くありますが、自分のアプリケーション用にコンテナイメージを作成することの方が多いでしょう。
+先に説明した通り、コンテナイメージとは、アプリケーションを配布するためのパッケージメカニズムであり、アプリケーションの実行に必要なアプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他のソフトウェアを含んでいます。
+コンテナイメージを作成するには、例えば既存のイメージを使ってコンテナを起動し、変更を加え、その結果を新しいコンテナイメージとして保存する方法もありますが、今回は典型的な手法であるDockerfile を用いた方法を見ていきます。
 Dockerfile #  ~/greeting-v1 に移動します。
 cd ~/exercises/greeting-v1 Dockerfileは、新しいコンテナイメージを作成するベースイメージの詳細と、それを作成するための手順を定義しています。Dockerfile の内容を表示します。
-cat Dockerfile FROMbusybox:latestCOPY hello goodbye /CMD [ &#34;/hello&#34; ]DockerfileのFROM命令は、ベースイメージの名前を指定します。
-COPY命令は、ローカルディレクトリからイメージにファイルをコピーするために使用されます。
-CMD命令は、コンテナイメージが明示的なコマンドを指定せずに実行された場合に実行されるコマンドを設定するために使用します。
+cat Dockerfile FROM busybox:latest COPY hello goodbye / CMD [ &quot;/hello&quot; ]   FROM 命令は、ベースイメージの名前を指定します。 COPY 命令は、ローカルディレクトリからイメージにファイルをコピーするために使用されます。 CMD 命令は、コンテナイメージが明示的なコマンドを指定せずに実行された場合に実行されるコマンドを設定するために使用します。  まとめると、busybox をベースイメージとし、その上にhello およびgoogbye というシェルスクリプト（単なるecho 1行）をコピーし、コンテナ起動時に（何も指定しなければ）そのスクリプトを起動する、というイメージです。
 Dockerfileの命令を使ってコンテナイメージを構築するには、次のように実行します。
-docker build -t greeting . -t でイメージの名前を指定し、&quot;.">
+docker build -t greeting . -t でイメージの名前を指定し、&quot;.&quot; はDockerfile のパスを指定しています。
+コンテナイメージを実行するには、次のように実行します。
+docker run --rm greeting あるいは、別のコマンドを実行するには、次のようにします。
+docker run --rm greeting /goodbye Dockerfileで使用できる命令の完全なリストについては、Dockerfile リファレンスを参照してください。">
 <meta name="theme-color" content="#FFFFFF">
-<meta name="color-scheme" content="light dark"><meta property="og:title" content="イメージ" />
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="コンテナイメージ" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/docs/container/image/" />
 
-<title>イメージ | コンテナ/Kubernetes ハンズオン</title>
+<title>コンテナイメージ | コンテナ/Kubernetes ハンズオン</title>
 <link rel="manifest" href="/k8s-workshop/manifest.json">
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -123,7 +109,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class="">Web サーバーの実行</a>
   
 
           
@@ -141,7 +127,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class=" active">イメージ</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class=" active">コンテナイメージ</a>
   
 
           
@@ -337,7 +323,7 @@ https://github.com/alex-shpak/hugo-book
     <img src="/k8s-workshop/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <strong>イメージ</strong>
+  <strong>コンテナイメージ</strong>
 
   <label for="toc-control">
     
@@ -353,8 +339,8 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#イメージとは">イメージとは</a></li>
-    <li><a href="#イメージのビルド">イメージのビルド</a></li>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
+    <li><a href="#コンテナイメージとは">コンテナイメージとは</a></li>
     <li><a href="#dockerfile">Dockerfile</a></li>
     <li><a href="#イメージの共有">イメージの共有</a></li>
   </ul>
@@ -369,40 +355,22 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h2 id="イメージとは">
-  イメージとは
-  <a class="anchor" href="#%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%81%a8%e3%81%af">#</a>
+  <article class="markdown"><h2 id="本セクションで学習すること">
+  本セクションで学習すること
+  <a class="anchor" href="#%e6%9c%ac%e3%82%bb%e3%82%af%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%a7%e5%ad%a6%e7%bf%92%e3%81%99%e3%82%8b%e3%81%93%e3%81%a8">#</a>
+</h2>
+<ul>
+<li>コンテナイメージの概要</li>
+<li>Dockerfile を使ったコンテナイメージの作成</li>
+<li>イメージレジストリを使ったコンテナイメージの共有</li>
+</ul>
+<h2 id="コンテナイメージとは">
+  コンテナイメージとは
+  <a class="anchor" href="#%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%81%a8%e3%81%af">#</a>
 </h2>
 <p>コンテナイメージから実行中のコンテナを作成しました。使用したコンテナイメージは、イメージレジストリから取得したものです。一般的に使用されているソフトウェアアプリケーション用のコンテナイメージは数多くありますが、自分のアプリケーション用にコンテナイメージを作成することの方が多いでしょう。</p>
-<p>コンテナイメージとは、アプリケーションを配布するためのパッケージメカニズムであり、アプリケーションの実行に必要なアプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他のソフトウェアを含んでいると説明しました。</p>
-<p>その意味では、コンテナイメージは、ファイルシステムを構成するために解凍されるtarballやzipファイルのようなものだと言えます。しかし、それよりも少し複雑です。</p>
-<p>コンテナイメージは、すべての必要なファイルを含む単一のパッケージではなく、パッケージの集合体であり、それぞれがコンテナイメージの1つのレイヤーのファイルを含んでいます。</p>
-<p>コンテナイメージのレイヤー</p>
-<p>各コンテナイメージは、まずベースレイヤーから始まります。ベースレイヤーには、通常、ベースとなるOSファイル、アプリケーション、ライブラリがすべて含まれています。</p>
-<p>その上にさらにレイヤーを追加していきます。各レイヤーでは、ファイルを追加したり、既存のファイルを変更したり、ファイルを削除したりします。</p>
-<p>既存のファイルを修正したり削除したりする場合、変更されるのは下位レイヤーのオリジナルファイルではありません。修正の場合は、変更を加えたファイルの新しいコピーが新しいレイヤーに存在し、下のレイヤーのオリジナルはそのまま存在します。ファイルの削除の場合は、そのレイヤーでファイルが削除されたことがレイヤーのメタデータに記録され、オリジナルは下のレイヤーに残っています。</p>
-<p>このように変更や削除が行われるのは、各レイヤーが不変であるためです。変更を加えるには、新しいレイヤーを作成するしかありません。</p>
-<p>コンテナイメージを使用してコンテナを作成する場合は、コンテナイメージの各レイヤーを重ね合わせてレイヤーを合成して表示する特殊なファイルシステムが使用されます。</p>
-<p>読み取り専用ファイルシステム</p>
-<p>この最終的なコンポジットビューは、それ自体が読み取り専用である。コンテナ内のファイルに加えられた変更は、コンテナの寿命まで存在する別のレイヤに存在することになる。</p>
-<p>コンテナのイメージフォーマットの実際の仕様は、OCI Image Format Specification で定義されています。また、コンテナ内でアプリケーションを実行するために、イメージをどのようにアンパックし、解釈し、使用するかは、OCI Runtime Specificationで定義されています。どちらの仕様も、Linux FoundationがスポンサーとなっているOpen Container Initiative のガバナンスの下で管理されています。</p>
-<h2 id="イメージのビルド">
-  イメージのビルド
-  <a class="anchor" href="#%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%81%ae%e3%83%93%e3%83%ab%e3%83%89">#</a>
-</h2>
-<p>コンテナイメージを構築するには、主に3つの方法があります。</p>
-<ul>
-<li>
-<p>既存のイメージを使ってコンテナを起動し、コンテナに変更を加え、その結果を新しいコンテナイメージとして保存することで、インタラクティブにイメージを構築する方法。</p>
-</li>
-<li>
-<p>入力ファイルに記述されたスクリプトを使って、バッチプロセスでコンテナイメージを作成する。典型的な例としては、Dockerfileを使用してコンテナイメージを作成することが挙げられる。</p>
-</li>
-<li>
-<p>tarballからファイルシステムのコピーをインポートしてコンテナイメージを作成する。</p>
-</li>
-</ul>
-<p>このワークショップでは、典型的な手法である2 つめのDockerfile を用いた方法を見ていきます。</p>
+<p>先に説明した通り、コンテナイメージとは、アプリケーションを配布するためのパッケージメカニズムであり、アプリケーションの実行に必要なアプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他のソフトウェアを含んでいます。</p>
+<p>コンテナイメージを作成するには、例えば既存のイメージを使ってコンテナを起動し、変更を加え、その結果を新しいコンテナイメージとして保存する方法もありますが、今回は典型的な手法であるDockerfile を用いた方法を見ていきます。</p>
 <h2 id="dockerfile">
   Dockerfile
   <a class="anchor" href="#dockerfile">#</a>
@@ -411,43 +379,38 @@ https://github.com/alex-shpak/hugo-book
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cd ~/exercises/greeting-v1
 </code></pre></div><p>Dockerfileは、新しいコンテナイメージを作成するベースイメージの詳細と、それを作成するための手順を定義しています。Dockerfile の内容を表示します。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat Dockerfile
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dockerfile" data-lang="dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> busybox:latest</span><span style="color:#960050;background-color:#1e0010">
-</span><span style="color:#960050;background-color:#1e0010">
-</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> hello goodbye /<span style="color:#960050;background-color:#1e0010">
-</span><span style="color:#960050;background-color:#1e0010">
-</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [ <span style="color:#e6db74">&#34;/hello&#34;</span> ]<span style="color:#960050;background-color:#1e0010">
-</span></code></pre></div><p>DockerfileのFROM命令は、ベースイメージの名前を指定します。</p>
-<p>COPY命令は、ローカルディレクトリからイメージにファイルをコピーするために使用されます。</p>
-<p>CMD命令は、コンテナイメージが明示的なコマンドを指定せずに実行された場合に実行されるコマンドを設定するために使用します。</p>
+</code></pre></div><pre><code>FROM busybox:latest
+COPY hello goodbye /
+CMD [ &quot;/hello&quot; ]
+</code></pre>
+<ul>
+<li>FROM 命令は、ベースイメージの名前を指定します。</li>
+<li>COPY 命令は、ローカルディレクトリからイメージにファイルをコピーするために使用されます。</li>
+<li>CMD 命令は、コンテナイメージが明示的なコマンドを指定せずに実行された場合に実行されるコマンドを設定するために使用します。</li>
+</ul>
+<p>まとめると、busybox をベースイメージとし、その上にhello およびgoogbye というシェルスクリプト（単なるecho 1行）をコピーし、コンテナ起動時に（何も指定しなければ）そのスクリプトを起動する、というイメージです。</p>
 <p>Dockerfileの命令を使ってコンテナイメージを構築するには、次のように実行します。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker build -t greeting .
 </code></pre></div><p>-t でイメージの名前を指定し、&quot;.&quot; はDockerfile のパスを指定しています。</p>
-<p>コンテナイメージのレイヤーを見るには、次のように実行します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker history greeting
-</code></pre></div><p>以下のような出力が得られるはずです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">IMAGE               CREATED             CREATED BY                                      SIZE
-COMMENT
-0ac1216f0e3f        <span style="color:#ae81ff">4</span> seconds ago       /bin/sh -c <span style="color:#75715e">#(nop)  CMD [&#34;/hello&#34;]               0B</span>
-aeea9801fb6a        <span style="color:#ae81ff">4</span> seconds ago       /bin/sh -c <span style="color:#75715e">#(nop) COPY multi:03e82c91fe5fcae…   50B</span>
-be5888e67be6        <span style="color:#ae81ff">5</span> days ago          /bin/sh -c <span style="color:#75715e">#(nop)  CMD [&#34;sh&#34;]                   0B</span>
-&lt;missing&gt;           <span style="color:#ae81ff">5</span> days ago          /bin/sh -c <span style="color:#75715e">#(nop) ADD file:09a89925137e1b768…   1.22MB</span>
-</code></pre></div><p>コンテナイメージの中に、DockerfileからのCOPYとCMDの文のためのレイヤーが作成されていることがわかります。</p>
 <p>コンテナイメージを実行するには、次のように実行します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">
-docker run --rm greeting
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --rm greeting
 </code></pre></div><p>あるいは、別のコマンドを実行するには、次のようにします。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --rm greeting /goodbye
-</code></pre></div><p>Dockerfileで使用できる命令の完全なリストについては、Dockerfileリファレンスをご覧ください。</p>
+</code></pre></div><p>Dockerfileで使用できる命令の完全なリストについては、Dockerfile リファレンスを参照してください。</p>
+<p><a href="https://docs.docker.com/engine/reference/builder/" target="_blank">
+    https://docs.docker.com/engine/reference/builder/
+</a></p>
 <h2 id="イメージの共有">
   イメージの共有
   <a class="anchor" href="#%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%81%ae%e5%85%b1%e6%9c%89">#</a>
 </h2>
-<p>独自のカスタムコンテナイメージを作成した後、それを別のホストシステムで実行する必要がある場合には、そのイメージを配布する方法が必要になります。</p>
-<p>コンテナイメージを配布する一般的な方法は、イメージレジストリにプッシュすることです。イメージレジストリにプッシュされたコンテナイメージは、他のホストにプルダウンして実行することができます。このためには、Docker Hub や Quay.io などのパブリックなイメージレジストリを使用するか、独自のプライベートなイメージレジストリを使用することができます。</p>
-<p>イメージをイメージレジストリにプッシュするには、まずそのイメージレジストリーにログインする必要があります。</p>
-<p>このワークショップの環境では、あなたはすでにログインしている自分のプライベートイメージレジストリを持っています。もし自分でやるのであれば、docker loginコマンドを使ってイメージレジストリの場所を指定します。すると、ログイン情報の入力を求められます。</p>
-<p>次に、コンテナイメージにイメージレジストリの名前を組み込んだ名前をタグ付けする必要があります。</p>
-<p>この時点でのイメージの名前はgreetingなので、イメージレジストリの名前を含む名前をタグ付けするには、次のように実行する必要があります。</p>
+<p>独自のカスタムコンテナイメージを作成した後、それを別のホストOS で実行する必要がある場合には、そのイメージを配布する方法が必要になります。</p>
+<p>コンテナイメージを配布する一般的な方法は、イメージレジストリにプッシュすることです。イメージレジストリにプッシュされたコンテナイメージは、他のホストにプルして実行することができます。このためには、Docker Hub などのパブリックなイメージレジストリを使用するか、<a href="https://goharbor.io/" target="_blank">
+    Harbor
+</a> など独自のプライベートなイメージレジストリを使用することができます。</p>
+<p>イメージをイメージレジストリにプッシュするには、まずそのイメージレジストリにログインする必要があります。</p>
+<p>このワークショップの環境では、すでにログインしている自分のプライベートイメージレジストリを持っています。もし自分でやるのであれば、docker loginコマンドを使ってイメージレジストリの場所を指定します。すると、ログイン情報の入力を求められます。</p>
+<p>次に、コンテナイメージにイメージレジストリの名前を組み込んだ名前をタグ付けする必要があります。この時点でのイメージの名前はgreetingなので、イメージレジストリの名前を含む名前をタグ付けするには、次のように実行する必要があります。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">NS<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>kubectl config view -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.contexts[].context.namespace}&#39;</span><span style="color:#66d9ef">)</span>
 </code></pre></div><blockquote class="book-hint info">
   上記コマンドはハンズオンのセッションによって異なるレジストリの名前の一部を取得しています。
@@ -499,8 +462,8 @@ docker run --rm greeting
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#イメージとは">イメージとは</a></li>
-    <li><a href="#イメージのビルド">イメージのビルド</a></li>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
+    <li><a href="#コンテナイメージとは">コンテナイメージとは</a></li>
     <li><a href="#dockerfile">Dockerfile</a></li>
     <li><a href="#イメージの共有">イメージの共有</a></li>
   </ul>

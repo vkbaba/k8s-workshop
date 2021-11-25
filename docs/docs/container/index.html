@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="ハンズオンの概要 #  コンテナは、OSレベルの仮想化の軽量な形態です。これにより、完全なOSを実行することなく、一連のアプリケーションプロセスを独自の分離された環境で実行することができます。
-このハンズオンでは、コンテナイメージを構築して実行する方法の基本を学びます。使用するツールはdockerです。
-使用するラボ #   ">
+このハンズオンでは、コンテナイメージを構築して実行する方法の基本を学びます。使用するツールはDocker です。 Docker 以外にも様々なコンテナランタイムがあります。
+https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+ 使用するラボ #  以下のTanzu Workshop にアクセスし、ラボはContainer Basics を選択してください。
+https://tanzu.vmware.com/developer/workshops/
+ ラボにアクセスする際、「Invalid session name supplied」などのエラーでラボが立ち上がらない場合があります。その際はブラウザの戻るボタンをクリックし、再度アクセスします。ラボは1 分程度で立ち上がるはずです。  ">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="コンテナハンズオン" />
 <meta property="og:description" content="" />
@@ -17,7 +20,7 @@
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -101,7 +104,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class="">Web サーバーの実行</a>
   
 
           
@@ -119,7 +122,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">コンテナイメージ</a>
   
 
           
@@ -350,13 +353,29 @@ https://github.com/alex-shpak/hugo-book
   <a class="anchor" href="#%e3%83%8f%e3%83%b3%e3%82%ba%e3%82%aa%e3%83%b3%e3%81%ae%e6%a6%82%e8%a6%81">#</a>
 </h2>
 <p>コンテナは、OSレベルの仮想化の軽量な形態です。これにより、完全なOSを実行することなく、一連のアプリケーションプロセスを独自の分離された環境で実行することができます。</p>
-<p>このハンズオンでは、コンテナイメージを構築して実行する方法の基本を学びます。使用するツールはdockerです。</p>
+<p>このハンズオンでは、コンテナイメージを構築して実行する方法の基本を学びます。使用するツールはDocker です。
+<blockquote class="book-hint info">
+  <p>Docker 以外にも様々なコンテナランタイムがあります。</p>
+<p><a href="https://kubernetes.io/docs/setup/production-environment/container-runtimes/" target="_blank">
+    https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+</a></p>
+
+</blockquote>
+</p>
 <h2 id="使用するラボ">
   使用するラボ
   <a class="anchor" href="#%e4%bd%bf%e7%94%a8%e3%81%99%e3%82%8b%e3%83%a9%e3%83%9c">#</a>
 </h2>
+<p>以下のTanzu Workshop にアクセスし、ラボはContainer Basics を選択してください。</p>
+<p><a href="https://tanzu.vmware.com/developer/workshops/" target="_blank">
+    https://tanzu.vmware.com/developer/workshops/
+</a></p>
 <figure><img src="c_access.png" width="75%"style="display: block; margin: auto;"/>
 </figure>
+<blockquote class="book-hint warning">
+  ラボにアクセスする際、「Invalid session name supplied」などのエラーでラボが立ち上がらない場合があります。その際はブラウザの戻るボタンをクリックし、再度アクセスします。ラボは1 分程度で立ち上がるはずです。
+</blockquote>
+
 </article>
  
       

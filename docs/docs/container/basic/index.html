@@ -3,18 +3,15 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="コンテナの起動 #  dockerを使ってアプリケーションをコンテナ内で起動するには、コンテナイメージが必要です。コンテナイメージは、アプリケーションを配布するためのパッケージメカニズムとして機能し、アプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他アプリケーションの実行に必要なソフトウェアが含まれています。
- アプリケーション用のあらかじめ構築されたコンテナイメージや、独自のコンテナイメージを構築するためのベースとなるコンテナイメージは、イメージレジストリを使用して配布されます。
-イメージレジストリは、Docker Hub のようなホスト型サービスが存在します。また、Github やGitLabのようなGitリポジトリのホスティングサービスでも、コンテナイメージのホスティングと配布をサポートしています。
-docker runを使ってイメージレジストリから既存のコンテナイメージをプルダウンして実行するには以下を実行します。
+<meta name="description" content="本セクションで学習すること #   コンテナの概要 コンテナの起動、停止、削除といった基本的な操作 コンテナの中に入った操作 コンテナのログ出力  コンテナの起動 #  dockerを使ってアプリケーションをコンテナ内で起動するには、コンテナイメージが必要です。コンテナイメージは、アプリケーションを配布するためのパッケージメカニズムとして機能し、アプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他アプリケーションの実行に必要なソフトウェアが含まれています。
+ コンテナイメージは仮想アプライアンスに近いですが、OS カーネルを含まないため非常に軽量です。  アプリケーション用のあらかじめ構築されたコンテナイメージや、独自のコンテナイメージを構築するためのベースとなるコンテナイメージは、イメージレジストリを使用して配布されます。
+イメージレジストリは、Docker Hub のようなホスト型サービスが存在します。また、Github やGitLabのようなGit リポジトリのホスティングサービスでも、コンテナイメージのホスティングと配布をサポートしています。
+さっそくコンテナをデプロイしてみましょう。docker runを使ってイメージレジストリから既存のコンテナイメージをプルダウンして実行するには以下を実行します。
 docker run docker.io/busybox:latest date アウトプットは以下のようになります。
-Unable to find image &#39;busybox:latest&#39; locally latest: Pulling from library/busybox e2334dd9fee4: Pull complete Digest: sha256:a8cf7ff6367c2afa2a90acd081b484cbded349a7076e7bdf37a05279f276bc12 Status: Downloaded newer image for busybox:latest Mon Apr 20 00:11:37 UTC 2020  このコマンドは、イメージをローカル環境にプルダウンするために行われた手順の詳細をログに記録します。この処理が完了すると、コンテナイメージからコンテナが起動され、コマンドラインで指定されたdateコマンドがコンテナ内で実行されます。dateコマンドはすぐに終了するので、コンテナはそのままシャットダウンされます。
-今回使用したコンテナイメージは、busyboxというものです。これは、非常にミニマルなUnixライクのコンテナイメージで、よく利用されるコマンドを詰め込んでいる便利なイメージです。最新バージョンのコンテナイメージを使用し（:latest）、Docker Hubのイメージレジストリ（docker.io）から取得するように指定しました。
+Unable to find image &#39;busybox:latest&#39; locally latest: Pulling from library/busybox e2334dd9fee4: Pull complete Digest: sha256:a8cf7ff6367c2afa2a90acd081b484cbded349a7076e7bdf37a05279f276bc12 Status: Downloaded newer image for busybox:latest Mon Apr 20 00:11:37 UTC 2020  このコマンドは、イメージをローカル環境にプルダウンするために行われた手順の詳細をログに記録します。この処理が完了すると、コンテナイメージからコンテナが起動され、コマンドラインで指定されたdateコマンドがコンテナ内で実行されます。date コマンドはすぐに終了するので、コンテナはそのままシャットダウンされます。
+今回使用したコンテナイメージは、busybox というものです。これは、非常にミニマルなUnix ライクのコンテナイメージで、よく利用されるコマンドを詰め込んでいる便利なイメージです。最新バージョンのコンテナイメージを使用し(:latest)、Docker Hub のイメージレジストリ(docker.io)から取得するように指定しました。
 このコマンドをもう1回実行してみてください。
-docker run docker.io/busybox:latest date dateコマンドがすぐに実行され、コンテナイメージを最初にプルダウンする必要があるという詳細情報は記録されないことがわかります。これは、コンテナイメージがローカル環境にキャッシュされ、次回以降の実行時に使用されるからです。
-どのようなコンテナイメージがローカル環境にプルダウンされたかは、次のように実行することで確認できます。
-docker images アウトプットは以下のようになります。
-REPOSITORY TAG IMAGE ID CREATED SIZE busybox latest be5888e67be6 5 days ago 1.">
+docker run docker.">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="基本操作" />
 <meta property="og:description" content="" />
@@ -26,7 +23,7 @@ REPOSITORY TAG IMAGE ID CREATED SIZE busybox latest be5888e67be6 5 days ago 1.">
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -110,7 +107,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class="">Web サーバーの実行</a>
   
 
           
@@ -128,7 +125,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">コンテナイメージ</a>
   
 
           
@@ -340,9 +337,11 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
     <li><a href="#コンテナの起動">コンテナの起動</a></li>
     <li><a href="#ターミナルの操作">ターミナルの操作</a></li>
     <li><a href="#コンテナの停止">コンテナの停止</a></li>
+    <li><a href="#演習">演習</a></li>
   </ul>
 </nav>
 
@@ -355,13 +354,27 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h2 id="コンテナの起動">
+  <article class="markdown"><h2 id="本セクションで学習すること">
+  本セクションで学習すること
+  <a class="anchor" href="#%e6%9c%ac%e3%82%bb%e3%82%af%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%a7%e5%ad%a6%e7%bf%92%e3%81%99%e3%82%8b%e3%81%93%e3%81%a8">#</a>
+</h2>
+<ul>
+<li>コンテナの概要</li>
+<li>コンテナの起動、停止、削除といった基本的な操作</li>
+<li>コンテナの中に入った操作</li>
+<li>コンテナのログ出力</li>
+</ul>
+<h2 id="コンテナの起動">
   コンテナの起動
   <a class="anchor" href="#%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e8%b5%b7%e5%8b%95">#</a>
 </h2>
 <p>dockerを使ってアプリケーションをコンテナ内で起動するには、コンテナイメージが必要です。コンテナイメージは、アプリケーションを配布するためのパッケージメカニズムとして機能し、アプリケーションソフトウェア、オペレーティングシステムファイル、ライブラリ、その他アプリケーションの実行に必要なソフトウェアが含まれています。</p>
 <figure><img src="c_image.png" width="75%"style="display: block; margin: auto;"/>
 </figure>
+<blockquote class="book-hint info">
+  コンテナイメージは仮想アプライアンスに近いですが、OS カーネルを含まないため非常に軽量です。
+</blockquote>
+
 <p>アプリケーション用のあらかじめ構築されたコンテナイメージや、独自のコンテナイメージを構築するためのベースとなるコンテナイメージは、イメージレジストリを使用して配布されます。</p>
 <p>イメージレジストリは、<a href="https://hub.docker.com/" target="_blank">
     Docker Hub
@@ -369,8 +382,8 @@ https://github.com/alex-shpak/hugo-book
     Github
 </a> や<a href="https://docs.gitlab.com/ee/user/packages/container_registry/" target="_blank">
     GitLab
-</a>のようなGitリポジトリのホスティングサービスでも、コンテナイメージのホスティングと配布をサポートしています。</p>
-<p>docker runを使ってイメージレジストリから既存のコンテナイメージをプルダウンして実行するには以下を実行します。</p>
+</a>のようなGit リポジトリのホスティングサービスでも、コンテナイメージのホスティングと配布をサポートしています。</p>
+<p>さっそくコンテナをデプロイしてみましょう。docker runを使ってイメージレジストリから既存のコンテナイメージをプルダウンして実行するには以下を実行します。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run docker.io/busybox:latest date
 </code></pre></div><p>アウトプットは以下のようになります。</p>
 <pre><code>Unable to find image 'busybox:latest' locally
@@ -380,8 +393,9 @@ Digest: sha256:a8cf7ff6367c2afa2a90acd081b484cbded349a7076e7bdf37a05279f276bc12
 Status: Downloaded newer image for busybox:latest
 Mon Apr 20 00:11:37 UTC 2020
 </code></pre>
-<p>このコマンドは、イメージをローカル環境にプルダウンするために行われた手順の詳細をログに記録します。この処理が完了すると、コンテナイメージからコンテナが起動され、コマンドラインで指定されたdateコマンドがコンテナ内で実行されます。dateコマンドはすぐに終了するので、コンテナはそのままシャットダウンされます。</p>
-<p>今回使用したコンテナイメージは、busyboxというものです。これは、非常にミニマルなUnixライクのコンテナイメージで、よく利用されるコマンドを詰め込んでいる便利なイメージです。最新バージョンのコンテナイメージを使用し（:latest）、Docker Hubのイメージレジストリ（docker.io）から取得するように指定しました。</p>
+<!-- raw HTML omitted -->
+<p>このコマンドは、イメージをローカル環境にプルダウンするために行われた手順の詳細をログに記録します。この処理が完了すると、コンテナイメージからコンテナが起動され、コマンドラインで指定されたdateコマンドがコンテナ内で実行されます。date コマンドはすぐに終了するので、コンテナはそのままシャットダウンされます。</p>
+<p>今回使用したコンテナイメージは、busybox というものです。これは、非常にミニマルなUnix ライクのコンテナイメージで、よく利用されるコマンドを詰め込んでいる便利なイメージです。最新バージョンのコンテナイメージを使用し(:latest)、Docker Hub のイメージレジストリ(docker.io)から取得するように指定しました。</p>
 <p>このコマンドをもう1回実行してみてください。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run docker.io/busybox:latest date
 </code></pre></div><p>dateコマンドがすぐに実行され、コンテナイメージを最初にプルダウンする必要があるという詳細情報は記録されないことがわかります。これは、コンテナイメージがローカル環境にキャッシュされ、次回以降の実行時に使用されるからです。</p>
@@ -391,7 +405,7 @@ Mon Apr 20 00:11:37 UTC 2020
 <pre><code>REPOSITORY  TAG     IMAGE ID      CREATED     SIZE
 busybox     latest  be5888e67be6  5 days ago  1.22MB
 </code></pre>
-<p>必要であれば、docker runはコンテナイメージを最初に必要とされるときにプルダウンします。実行される前にイメージをプルダウンしたい場合は、docker pullコマンドを使用することができます。</p>
+<p>必要であれば、docker run はコンテナイメージを最初に必要とされるときにプルダウンします。実行される前にイメージをプルダウンしたい場合は、docker pullコマンドを使用することができます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker pull docker.io/busybox:latest
 </code></pre></div><h2 id="ターミナルの操作">
   ターミナルの操作
@@ -400,15 +414,12 @@ busybox     latest  be5888e67be6  5 days ago  1.22MB
 <p>先ほどはbusybox コンテナイメージから起動したコンテナ内で date コマンドを実行しました。コンテナイメージに含まれている任意のアプリケーションを実行することができます。</p>
 <p>コンテナを作成して、その中でコマンドを実行するために対話したい場合は、対話型シェルを実行します。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run -it busybox sh
-</code></pre></div><p>対話型端末を必要とするコマンドを実行する場合は、docker runに-itオプションを指定する必要があります。これにより、ターミナルが確保され、stdinが入力可能な状態に保たれます。</p>
-<p>参考 : <a href="https://ohbarye.hatenablog.jp/entry/2019/05/05/learn-tty-with-docker" target="_blank">
-    https://ohbarye.hatenablog.jp/entry/2019/05/05/learn-tty-with-docker
-</a></p>
+</code></pre></div><p>対話型端末を必要とするコマンドを実行する場合は、docker runに-itオプションを指定する必要があります。これにより、ターミナルが確保され、stdin が入力可能な状態に保たれます。つまり、手元のターミナルで入力したコマンドをコンテナの中で実行し、その結果をターミナルで受け取れるようになります。</p>
 <blockquote class="book-hint info">
   「コンテナの中に入って何か操作をしたい場合 = -it」 と最初は覚えてしまいましょう。
 </blockquote>
 
-<p>また、今回はコンテナイメージの名前をbusyboxと略しています。バージョンタグが指定されていない場合は latest が使用されます。イメージレジストリのホストが指定されていない場合は、dockerのグローバル設定で定義されているデフォルトのイメージレジストリが検索されます。すでにDocker Hubからbusybox:latestのイメージを取り出しているので、それがマッチします。</p>
+<p>また、今回はコンテナイメージの名前をbusybox と略しています。バージョンタグが指定されていない場合は latest が使用されます。イメージレジストリのホストが指定されていない場合は、docker のグローバル設定で定義されているデフォルトのイメージレジストリが検索されます。ここではDocker Hub からイメージを取得しました。</p>
 <p>コンテナ内で実行されているプロセスの一覧を見るには、次のように実行します。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">ps
 </code></pre></div><p>以下のような出力が表示されるはずです。</p>
@@ -416,10 +427,9 @@ busybox     latest  be5888e67be6  5 days ago  1.22MB
     1 root 0:00 sh
     8 root 0:00 ps
 </code></pre>
-<p>コンテナのコンテキスト内で起動したプロセスのみが表示されます。下層のコンテナホスト（例えばコンテナを実行している仮想マシン）で実行されているプロセスは表示されません。</p>
-<p>実行中のコンテナの一覧を表示するには、コンテナホスト上で実行します。ターミナル2 でdocker ps コマンドを試してみてください（ターミナル1 はコンテナの中に入ったままです）。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">exit
-docker ps
+<p>コンテナのコンテキスト内で起動したプロセスのみが表示されます。下層のコンテナホスト(例えばコンテナを実行している仮想マシン)で実行されているプロセスは表示されません。</p>
+<p>実行中のコンテナの一覧を表示するには、コンテナホスト上で実行します。<strong>ターミナル2</strong> でdocker ps コマンドを試してみてください(ターミナル1 はコンテナの中に入ったままです)。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps
 </code></pre></div><p>上記で起動したコンテナが対話型シェルで実行されているのが確認できるはずです。</p>
 <pre><code>CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS             NAMES
 ae576793e3e9        busybox             &quot;sh&quot;                32 seconds ago      Up 31 seconds                         recursing_leavitt
@@ -453,15 +463,9 @@ e894e7d5790f        busybox:latest      &quot;date&quot;              3 minutes 
 </code></pre>
 <p>コンテナからの出力はログファイルにも取り込まれます。コンテナIDを引数にしてdocker logsコマンドを実行すると、実行中または停止中のコンテナのログファイルを見ることができます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker logs <span style="color:#e6db74">`</span>docker ps -ql<span style="color:#e6db74">`</span>
-</code></pre></div><p>コンテナのログファイルに加えて、コンテナ内からファイルシステムに加えられた変更のコピーも保存されるため、停止中のコンテナからファイルをコピーしたり、停止中のコンテナから新しいコンテナイメージを作成したりすることもできます。
-<details ><summary>補足</summary>
-  <div class="markdown-inner">
-    どこにあるか
-  </div>
-</details>
-</p>
+</code></pre></div><p>コンテナのログファイルに加えて、コンテナ内からファイルシステムに加えられた変更のコピーも保存されるため、停止中のコンテナからファイルをコピーしたり、停止中のコンテナから新しいコンテナイメージを作成したりすることもできます。</p>
 <p>停止したコンテナにはいくつかの用途がありますが、スペースを消費しますので、停止したコンテナを削除することが重要です。そうしないと、最終的にはディスクスペースが足りなくなってしまいます。</p>
-<p>停止したコンテナを1つだけ削除するには、コンテナIDを引数にしてdocker rmを使用します。</p>
+<p>停止したコンテナを1つだけ削除するには、コンテナID を引数にしてdocker rmを使用します。ここでは、docker ps -ql でコンテナID を取得しています。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker rm <span style="color:#e6db74">`</span>docker ps -ql<span style="color:#e6db74">`</span>
 </code></pre></div><p>これで、停止していた2つのコンテナだけが残るはずです。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps -a
@@ -473,10 +477,60 @@ e894e7d5790f        busybox:latest      &quot;date&quot;              3 minutes 
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --rm busybox date
 </code></pre></div><p>このオプションを使用すると、停止したコンテナは自動的に削除されます。
 <blockquote class="book-hint info">
-  検証目的においては常に--rm オプションをつけるよう意識しておくとディスクスペースの節約につながります。</p>
-<!-- raw HTML omitted -->
+  検証目的においては常に--rm オプションをつけるよう意識しておくとディスクスペースの節約につながります。
 </blockquote>
 </p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps -a
+</code></pre></div><h2 id="演習">
+  演習
+  <a class="anchor" href="#%e6%bc%94%e7%bf%92">#</a>
+</h2>
+<ol>
+<li>コンテナはOS を含まないと説明しましたが、コンテナイメージには下記のようにubuntu やcentos があります。この理由は何でしょうか？
+<ol>
+<li><a href="https://hub.docker.com/_/ubuntu" target="_blank">
+    https://hub.docker.com/_/ubuntu
+</a></li>
+<li><a href="https://hub.docker.com/_/centos" target="_blank">
+    https://hub.docker.com/_/centos
+</a></li>
+</ol>
+</li>
+<li>本セクションの一番最初のコマンドは下記の通りですが、date コマンドを入力しない場合はどうなるでしょうか？この理由は何でしょうか？また、docker exec を使わず、どうすればbusybox を一定時間起動しておくことができるか考えてみてください。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run docker.io/busybox:latest date
+</code></pre></div><details ><summary>解答</summary>
+  <div class="markdown-inner">
+    <ol>
+<li>正しくはOS &ldquo;カーネル&rdquo; を含まない、です。ubuntu やcentos をコンテナで実行したとしても、それらはホストOS を共有しているため、cat /proc/version で調べられるカーネルのバージョンは同一になります。これらの違いは、Linux を使いやすくするために提供されるソフトウェア群、例えばapt (ubuntu) とyum (centos) などの違いに現れます。</li>
+<li>まずはdate コマンドなしで実行してみましょう。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run docker.io/busybox:latest
+</code></pre></div><p>何も出力されず、docker ps で調べても起動中のコンテナはありません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps
+</code></pre></div><pre><code>CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps -a
+</code></pre></div><p>出力は以下のようになります。この例ですとコンテナ自体は作成されましたが、5 秒後にExited(終了)していることが分かります。</p>
+<pre><code>CONTAINER ID   IMAGE            COMMAND                  CREATED          STATUS                      PORTS     NAMES
+37341b4975aa   busybox:latest   &quot;sh&quot;                     6 seconds ago    Exited (0) 5 seconds ago              hopeful_zhukovsky
+</code></pre>
+<p>これは、コンテナの中で実行されたメインプロセスが実行され、終了したためです。言い換えると、date コマンドを入力した場合は、date コマンドを実行することが唯一の役割であり、日付を表示するという役割を終えたためにコンテナは停止しました。何も実行しない場合は、出力の通りsh コマンドを実行し（何も起こらなかったように見えますが）、コンテナは停止します。</p>
+<p>ではbusybox を長時間起動するにはどうしたらよいでしょうか？docker exec でコンテナの中に入ることで、コンテナがすぐに終了することを防ぐこともできますが、コンテナから抜けた場合は停止してしまいます。</p>
+<p>そこで、これを実現する典型的な1 つの方法として、sleep コマンドを使います。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run docker.io/busybox:latest sleep <span style="color:#ae81ff">10</span>
+</code></pre></div><p>これは、10 秒待ってからコンテナが停止します。ただ、上記の方法だと実行中そのターミナルでは操作できないため、-d オプションをつけることでバックグラウンドでの実行が可能です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run -d docker.io/busybox:latest sleep <span style="color:#ae81ff">60</span>
+</code></pre></div><p>docker ps で稼働中のコンテナが見えますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps 
+</code></pre></div><pre><code>CONTAINER ID   IMAGE            COMMAND      CREATED          STATUS          PORTS     NAMES
+5c517a3f2493   busybox:latest   &quot;sleep 60&quot;   20 seconds ago   Up 19 seconds             nervous_vaughan
+</code></pre>
+<p>sleep が実行されているコンテナにexec することもできますので、何らかの検証やトラブルシューティングの際に活用できる場合があります。</p>
+
+  </div>
+</details>
+
 </article>
  
       
@@ -518,9 +572,11 @@ e894e7d5790f        busybox:latest      &quot;date&quot;              3 minutes 
   
 <nav id="TableOfContents">
   <ul>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
     <li><a href="#コンテナの起動">コンテナの起動</a></li>
     <li><a href="#ターミナルの操作">ターミナルの操作</a></li>
     <li><a href="#コンテナの停止">コンテナの停止</a></li>
+    <li><a href="#演習">演習</a></li>
   </ul>
 </nav>
 

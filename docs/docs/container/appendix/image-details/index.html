@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="イメージの詳細 #  ">
+<meta name="description" content="イメージの詳細 #  その意味では、コンテナイメージは、ファイルシステムを構成するために解凍されるtarballやzipファイルのようなものだと言えます。しかし、それよりも少し複雑です。
+コンテナイメージは、すべての必要なファイルを含む単一のパッケージではなく、パッケージの集合体であり、それぞれがコンテナイメージの1つのレイヤーのファイルを含んでいます。
+コンテナイメージのレイヤー
+各コンテナイメージは、まずベースレイヤーから始まります。ベースレイヤーには、通常、ベースとなるOSファイル、アプリケーション、ライブラリがすべて含まれています。
+その上にさらにレイヤーを追加していきます。各レイヤーでは、ファイルを追加したり、既存のファイルを変更したり、ファイルを削除したりします。
+既存のファイルを修正したり削除したりする場合、変更されるのは下位レイヤーのオリジナルファイルではありません。修正の場合は、変更を加えたファイルの新しいコピーが新しいレイヤーに存在し、下のレイヤーのオリジナルはそのまま存在します。ファイルの削除の場合は、そのレイヤーでファイルが削除されたことがレイヤーのメタデータに記録され、オリジナルは下のレイヤーに残っています。
+このように変更や削除が行われるのは、各レイヤーが不変であるためです。変更を加えるには、新しいレイヤーを作成するしかありません。
+コンテナイメージを使用してコンテナを作成する場合は、コンテナイメージの各レイヤーを重ね合わせてレイヤーを合成して表示する特殊なファイルシステムが使用されます。
+読み取り専用ファイルシステム
+この最終的なコンポジットビューは、それ自体が読み取り専用である。コンテナ内のファイルに加えられた変更は、コンテナの寿命まで存在する別のレイヤに存在することになる。
+コンテナのイメージフォーマットの実際の仕様は、OCI Image Format Specification で定義されています。また、コンテナ内でアプリケーションを実行するために、イメージをどのようにアンパックし、解釈し、使用するかは、OCI Runtime Specificationで定義されています。どちらの仕様も、Linux FoundationがスポンサーとなっているOpen Container Initiative のガバナンスの下で管理されています。
+コンテナイメージのレイヤーを見るには、次のように実行します。
+docker history greeting 以下のような出力が得られるはずです。
+IMAGE CREATED CREATED BY SIZE COMMENT 0ac1216f0e3f 4 seconds ago /bin/sh -c #(nop) CMD [&quot;/hello&quot;] 0B aeea9801fb6a 4 seconds ago /bin/sh -c #(nop) COPY multi:03e82c91fe5fcae… 50B be5888e67be6 5 days ago /bin/sh -c #(nop) CMD [&quot;sh&quot;] 0B &lt;missing&gt; 5 days ago /bin/sh -c #(nop) ADD file:09a89925137e1b768… 1.">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="イメージの詳細" />
 <meta property="og:description" content="" />
@@ -15,7 +28,7 @@
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -99,7 +112,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class="">Web サーバーの実行</a>
   
 
           
@@ -117,7 +130,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">コンテナイメージ</a>
   
 
           
@@ -346,6 +359,28 @@ https://github.com/alex-shpak/hugo-book
   イメージの詳細
   <a class="anchor" href="#%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%81%ae%e8%a9%b3%e7%b4%b0">#</a>
 </h2>
+<p>その意味では、コンテナイメージは、ファイルシステムを構成するために解凍されるtarballやzipファイルのようなものだと言えます。しかし、それよりも少し複雑です。</p>
+<p>コンテナイメージは、すべての必要なファイルを含む単一のパッケージではなく、パッケージの集合体であり、それぞれがコンテナイメージの1つのレイヤーのファイルを含んでいます。</p>
+<p>コンテナイメージのレイヤー</p>
+<p>各コンテナイメージは、まずベースレイヤーから始まります。ベースレイヤーには、通常、ベースとなるOSファイル、アプリケーション、ライブラリがすべて含まれています。</p>
+<p>その上にさらにレイヤーを追加していきます。各レイヤーでは、ファイルを追加したり、既存のファイルを変更したり、ファイルを削除したりします。</p>
+<p>既存のファイルを修正したり削除したりする場合、変更されるのは下位レイヤーのオリジナルファイルではありません。修正の場合は、変更を加えたファイルの新しいコピーが新しいレイヤーに存在し、下のレイヤーのオリジナルはそのまま存在します。ファイルの削除の場合は、そのレイヤーでファイルが削除されたことがレイヤーのメタデータに記録され、オリジナルは下のレイヤーに残っています。</p>
+<p>このように変更や削除が行われるのは、各レイヤーが不変であるためです。変更を加えるには、新しいレイヤーを作成するしかありません。</p>
+<p>コンテナイメージを使用してコンテナを作成する場合は、コンテナイメージの各レイヤーを重ね合わせてレイヤーを合成して表示する特殊なファイルシステムが使用されます。</p>
+<p>読み取り専用ファイルシステム</p>
+<p>この最終的なコンポジットビューは、それ自体が読み取り専用である。コンテナ内のファイルに加えられた変更は、コンテナの寿命まで存在する別のレイヤに存在することになる。</p>
+<p>コンテナのイメージフォーマットの実際の仕様は、OCI Image Format Specification で定義されています。また、コンテナ内でアプリケーションを実行するために、イメージをどのようにアンパックし、解釈し、使用するかは、OCI Runtime Specificationで定義されています。どちらの仕様も、Linux FoundationがスポンサーとなっているOpen Container Initiative のガバナンスの下で管理されています。</p>
+<p>コンテナイメージのレイヤーを見るには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker history greeting
+</code></pre></div><p>以下のような出力が得られるはずです。</p>
+<pre><code>IMAGE               CREATED             CREATED BY                                      SIZE
+COMMENT
+0ac1216f0e3f        4 seconds ago       /bin/sh -c #(nop)  CMD [&quot;/hello&quot;]               0B
+aeea9801fb6a        4 seconds ago       /bin/sh -c #(nop) COPY multi:03e82c91fe5fcae…   50B
+be5888e67be6        5 days ago          /bin/sh -c #(nop)  CMD [&quot;sh&quot;]                   0B
+&lt;missing&gt;           5 days ago          /bin/sh -c #(nop) ADD file:09a89925137e1b768…   1.22MB
+</code></pre>
+<p>コンテナイメージの中に、DockerfileからのCOPY とCMD の文のためのレイヤーが作成されていることがわかります。</p>
 </article>
  
       

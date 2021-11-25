@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="まとめ #  お疲れ様でした。">
+<meta name="description" content="まとめ #  本ハンズオンでは以下のことを学習しました。
+基本操作 #   コンテナの概要 コンテナの起動、停止、削除といった基本的な操作 コンテナの中に入った操作 コンテナのログ出力  Web サーバーの実行 #   Web サーバーの実行(busybox) ポートフォワードによるWeb サーバーへのアクセス Web サーバーの実行(nginx)  コンテナイメージ #   コンテナイメージの概要 Dockerfile を使ったコンテナイメージの作成 イメージレジストリを使ったコンテナイメージの共有  ラボを終了する場合は、ブラウザのタブを閉じるか、Terminate ボタンをクリックしてください。">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light dark"><meta property="og:title" content="まとめ" />
 <meta property="og:description" content="" />
@@ -15,7 +16,7 @@
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.2084d7b93f4aa4c91f55485d7a7cd9fc2749526031d8c43ab2e0aa4d48780063.js" integrity="sha256-IITXuT9KpMkfVUhdenzZ/CdJUmAx2MQ6suCqTUh4AGM=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -99,7 +100,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/network/" class="">Web サーバーの公開</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class="">Web サーバーの実行</a>
   
 
           
@@ -117,7 +118,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">イメージ</a>
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">コンテナイメージ</a>
   
 
           
@@ -329,7 +330,13 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#まとめ">まとめ</a>
+      <ul>
+        <li><a href="#基本操作">基本操作</a></li>
+        <li><a href="#web-サーバーの実行">Web サーバーの実行</a></li>
+        <li><a href="#コンテナイメージ">コンテナイメージ</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -346,7 +353,38 @@ https://github.com/alex-shpak/hugo-book
   まとめ
   <a class="anchor" href="#%e3%81%be%e3%81%a8%e3%82%81">#</a>
 </h2>
-<p>お疲れ様でした。</p>
+<p>本ハンズオンでは以下のことを学習しました。</p>
+<h3 id="基本操作">
+  基本操作
+  <a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e6%93%8d%e4%bd%9c">#</a>
+</h3>
+<ul>
+<li>コンテナの概要</li>
+<li>コンテナの起動、停止、削除といった基本的な操作</li>
+<li>コンテナの中に入った操作</li>
+<li>コンテナのログ出力</li>
+</ul>
+<h3 id="web-サーバーの実行">
+  Web サーバーの実行
+  <a class="anchor" href="#web-%e3%82%b5%e3%83%bc%e3%83%90%e3%83%bc%e3%81%ae%e5%ae%9f%e8%a1%8c">#</a>
+</h3>
+<ul>
+<li>Web サーバーの実行(busybox)</li>
+<li>ポートフォワードによるWeb サーバーへのアクセス</li>
+<li>Web サーバーの実行(nginx)</li>
+</ul>
+<h3 id="コンテナイメージ">
+  コンテナイメージ
+  <a class="anchor" href="#%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8">#</a>
+</h3>
+<ul>
+<li>コンテナイメージの概要</li>
+<li>Dockerfile を使ったコンテナイメージの作成</li>
+<li>イメージレジストリを使ったコンテナイメージの共有</li>
+</ul>
+<p>ラボを終了する場合は、ブラウザのタブを閉じるか、Terminate ボタンをクリックしてください。
+<figure><img src="c_terminate.png" width="75%"style="display: block; margin: auto;"/>
+</figure></p>
 </article>
  
       
@@ -388,7 +426,13 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#まとめ">まとめ</a>
+      <ul>
+        <li><a href="#基本操作">基本操作</a></li>
+        <li><a href="#web-サーバーの実行">Web サーバーの実行</a></li>
+        <li><a href="#コンテナイメージ">コンテナイメージ</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="本セクションで学習すること #   Web サーバーの実行(busybox) ポートフォワードによるWeb サーバーへのアクセス Web サーバーの実行(nginx)  Web サーバーの実行 #  これまでに実行したすべてのコンテナは、実行元のターミナルに接続されたままでした。コンテナからの出力はターミナルに表示され、コンテナを停止したときに初めてコマンドプロンプトが戻ってきます。
+コンテナ内で実行される長時間稼働のネットワークサービスは、ターミナルから切り離してバックグラウンドプロセスとして実行する必要があります。
+busybox イメージを使用してWebサーバーを実行するには、次のように実行します。
+docker run --rm -d --name httpd -p 8080:80 busybox httpd -f -vv docker runに-dオプションを付けると、コンテナがターミナルから切り離されてバックグラウンドで実行されます。
+このコンテナをより簡単に識別して操作できるように、--nameオプションを使ってhttpdという名前をつけます。
+Webサーバはネットワークサービスなので、公開するネットワークポートを指定する必要があります。これには-pオプションを使用します。
+補足 -p オプションはポートフォワードをするためのオプションです。コンテナのWeb サービスはポート80 で待ち受けていますが、単にlocalhost:80 でアクセスした場合、それはコンテナを実行している「ホストOS の」ポート80 を意味します（ホストOS 側でポート80 で待ち受けるWeb サービスが既に起動していた場合、アクセス先がlocalhost:80 で重複することになってしまい困ります）。
+-p オプションは、-p M:N という形で表現され、「ホストOS のポート」M : 「コンテナのポート」N を紐づけることで、localhost:8080 のアクセスをコンテナのポート80 にフォワードし、コンテナのWeb サービスへのアクセスを可能とします。
+  最後に、コンテナ内で実行するコマンドとして、httpd -f -vvを使用します。
+httpdの-fオプションは、ウェブサーバーがコンテナのコンテキスト内でフォアグラウンドプロセスとして実行されるようにします。これが行われないと、コンテナはすぐに終了してしまいます。-vv は詳細なロギングを可能にします。
+コンテナが稼働していることを確認するには、次のように実行します。
+docker ps コンテナからの出力を追跡するには、次のように実行します。
+docker logs -f httpd コンテナID の代わりに、コンテナに割り当てたhttpd名を使用します。f オプションは、ログファイルを継続的にテーリングすることを意味します。 初期状態ではログが出力されていませんが、次のように実行して、Webサーバに対してWebリクエストを行ってください。">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="Web サーバーの実行" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://vkbaba.github.io/k8s-workshop/docs/container/web/" />
+
+<title>Web サーバーの実行 | コンテナ/Kubernetes ハンズオン</title>
+<link rel="manifest" href="/k8s-workshop/manifest.json">
+<link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
+  <script defer src="/k8s-workshop/flexsearch.min.js"></script>
+  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" href="/k8s-workshop/css/copy.css">
+<script defer src="/k8s-workshop/js/copy.js"></script>
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/k8s-workshop/"><span>コンテナ/Kubernetes ハンズオン</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/" class="">コンテナハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/web/" class=" active">Web サーバーの実行</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/image/" class="">コンテナイメージ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/container/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/" class="">Kubernetes ハンズオン</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/basic/" class="">基本操作</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/resource/" class="">リソースの詳細</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class="">ネットワーク</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class="">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/summary/" class="">まとめ</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var a=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/k8s-workshop/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Web サーバーの実行</strong>
+
+  <label for="toc-control">
+    
+    <img src="/k8s-workshop/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
+    <li><a href="#web-サーバーの実行">Web サーバーの実行</a></li>
+    <li><a href="#演習">演習</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="本セクションで学習すること">
+  本セクションで学習すること
+  <a class="anchor" href="#%e6%9c%ac%e3%82%bb%e3%82%af%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%a7%e5%ad%a6%e7%bf%92%e3%81%99%e3%82%8b%e3%81%93%e3%81%a8">#</a>
+</h2>
+<ul>
+<li>Web サーバーの実行(busybox)</li>
+<li>ポートフォワードによるWeb サーバーへのアクセス</li>
+<li>Web サーバーの実行(nginx)</li>
+</ul>
+<h2 id="web-サーバーの実行">
+  Web サーバーの実行
+  <a class="anchor" href="#web-%e3%82%b5%e3%83%bc%e3%83%90%e3%83%bc%e3%81%ae%e5%ae%9f%e8%a1%8c">#</a>
+</h2>
+<p>これまでに実行したすべてのコンテナは、実行元のターミナルに接続されたままでした。コンテナからの出力はターミナルに表示され、コンテナを停止したときに初めてコマンドプロンプトが戻ってきます。</p>
+<p>コンテナ内で実行される長時間稼働のネットワークサービスは、ターミナルから切り離してバックグラウンドプロセスとして実行する必要があります。</p>
+<p>busybox イメージを使用してWebサーバーを実行するには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --rm -d --name httpd -p 8080:80 busybox httpd -f -vv
+</code></pre></div><p>docker runに-dオプションを付けると、コンテナがターミナルから切り離されてバックグラウンドで実行されます。</p>
+<p>このコンテナをより簡単に識別して操作できるように、--nameオプションを使ってhttpdという名前をつけます。</p>
+<p>Webサーバはネットワークサービスなので、公開するネットワークポートを指定する必要があります。これには-pオプションを使用します。</p>
+<details ><summary>補足</summary>
+  <div class="markdown-inner">
+    <p>-p オプションはポートフォワードをするためのオプションです。コンテナのWeb サービスはポート80 で待ち受けていますが、単にlocalhost:80 でアクセスした場合、それはコンテナを実行している「ホストOS の」ポート80 を意味します（ホストOS 側でポート80 で待ち受けるWeb サービスが既に起動していた場合、アクセス先がlocalhost:80 で重複することになってしまい困ります）。</p>
+<p>-p オプションは、-p M:N という形で表現され、「ホストOS のポート」M : 「コンテナのポート」N を紐づけることで、localhost:8080 のアクセスをコンテナのポート80 にフォワードし、コンテナのWeb サービスへのアクセスを可能とします。</p>
+
+  </div>
+</details>
+
+<p>最後に、コンテナ内で実行するコマンドとして、httpd -f -vvを使用します。</p>
+<p>httpdの-fオプションは、ウェブサーバーがコンテナのコンテキスト内でフォアグラウンドプロセスとして実行されるようにします。これが行われないと、コンテナはすぐに終了してしまいます。-vv は詳細なロギングを可能にします。</p>
+<p>コンテナが稼働していることを確認するには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker ps
+</code></pre></div><p>コンテナからの出力を追跡するには、次のように実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker logs -f httpd
+</code></pre></div><p>コンテナID の代わりに、コンテナに割り当てたhttpd名を使用します。f オプションは、ログファイルを継続的にテーリングすることを意味します。
+初期状態ではログが出力されていませんが、次のように実行して、Webサーバに対してWebリクエストを行ってください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl localhost:8080
+</code></pre></div><p>これを実行すると、リクエストの詳細がログに記録されるはずです。このケースでは、提供すべきファイルを提供していないため、Webサーバからエラーが発生しています。</p>
+<p>なお、コンテナはターミナルから切り離され、バックグラウンドで実行されているので、停止するには以下を実行する必要があります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker stop --time <span style="color:#ae81ff">2</span> httpd
+</code></pre></div><h2 id="演習">
+  演習
+  <a class="anchor" href="#%e6%bc%94%e7%bf%92">#</a>
+</h2>
+<ol>
+<li>busybox ではなくnginx イメージを使って、コンテナでWeb サーバーをバックグラウンドで実行してみてください。また、curl で接続して、応答が返ってくることを確認しましょう。次に、nginx のログを出力してみて、実際にアクセスがあったことを確かめてみてください。最後に、実行したコンテナを停止し、削除をしてください。</li>
+<li>-p オプションを使わず、nginx をデプロイし、同様にアクセスしてみてください。</li>
+</ol>
+<details ><summary>解答</summary>
+  <div class="markdown-inner">
+    <ol>
+<li>初めてnginx を実行する際はイメージキャッシュが保存されていないため、自動的にレジストリからダウンロードされます。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --rm -d --name nginx -p 8080:80 nginx
+</code></pre></div><p>割り当てたポートに対してcurl を実行してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl localhost:8080
+</code></pre></div><p>以下のように、&ldquo;Welcome to nginx!&rdquo; と表示されたらOK です。</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+&lt;p&gt;If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.&lt;/p&gt;
+
+&lt;p&gt;For online documentation and support please refer to
+&lt;a href=&quot;http://nginx.org/&quot;&gt;nginx.org&lt;/a&gt;.&lt;br/&gt;
+Commercial support is available at
+&lt;a href=&quot;http://nginx.com/&quot;&gt;nginx.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Thank you for using nginx.&lt;/em&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>アクセスログも見てみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker logs -f nginx
+</code></pre></div><p>自身のIP アドレス（ここでは172.17.0.1）からHTTP GET リクエストが実行されていることが分かりますね。</p>
+<pre><code>172.17.0.1 - - [17/Nov/2021:12:17:15 +0000] &quot;GET / HTTP/1.1&quot; 200 615 &quot;-&quot; &quot;curl/7.66.0&quot; &quot;-&quot;
+</code></pre>
+<p>最後にコンテナを削除します。起動時に--rm オプションを付けたので、docker stop で自動的に削除されます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker stop nginx
+</code></pre></div><ol start="2">
+<li>-p オプションを使わない場合はポートフォワードを使えません。したがって、コンテナのIP アドレスに直接アクセスしましょう。
+コンテナのIP アドレスを調べる方法の1 つは以下の通りです。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker inspect httpd | grep IPAddress
+</code></pre></div><pre><code>&quot;SecondaryIPAddresses&quot;: null,
+&quot;IPAddress&quot;: &quot;172.17.0.2&quot;,
+       &quot;IPAddress&quot;: &quot;172.17.0.2&quot;,
+</code></pre>
+<p>この場合は172.17.0.2 がコンテナのIP アドレスなので、直接curl を実行できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl 172.17.0.2
+</code></pre></div>
+  </div>
+</details>
+
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function a(c){const a=window.getSelection(),b=document.createRange();b.selectNodeContents(c),a.removeAllRanges(),a.addRange(b)}document.querySelectorAll("pre code").forEach(b=>{b.addEventListener("click",function(c){a(b.parentElement),navigator.clipboard&&navigator.clipboard.writeText(b.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
+    <li><a href="#web-サーバーの実行">Web サーバーの実行</a></li>
+    <li><a href="#演習">演習</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
