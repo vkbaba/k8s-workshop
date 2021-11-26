@@ -1,7 +1,15 @@
 ---
-weight: 4
+weight: 3
 title: "ネットワーク"
 ---
+
+## 本セクションで学習すること
+- Kubernetes の名前空間
+- Pod 間通信とCNI
+- Servie リソース
+- Ingress リソース
+- （補足）Kubernetes におけるLoadBalancer
+
 ## 名前空間
 ネットワークの前に簡単にNamespace (名前空間) に関して説明します。名前空間はKubernetes におけるリソースを適切に分離する仕組みのことです。例えば、1つのKubernetes クラスタを複数で利用する際に、名前空間を分けない場合はアプリケーションの名前が被ってはいけませんが、名前空間を分けることで、このような重複を気にする必要がなくなります。他にも、名前空間の間の通信を制御したり、機能を制限したりと、Kubernetes におけるマルチテナントの提供形態の1 つと言い換えることもできます。
 
@@ -41,6 +49,8 @@ kubectl get pod -n kube-system
 ```
 
     Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:eduk8s-labs-w01:eduk8s-labs-w01-s283" cannot list resource "pods" in API group "" in the namespace "kube-system"
+
+{{< figure src="k_eduk8s.png" width="100%">}}
 
 
 ## Kubernetes のネットワークの基本
@@ -91,7 +101,7 @@ cat ~/frontend/service.yaml
         protocol: TCP
         targetPort: 8080
 
-これをkubectl apply すると、blog という名前のService が作成されたことになります。このマニフェストは「app:blog というラベルが付いたアプリケーションのためにポート8080 を公開し、Pod が待ち受けているポート8080 にマッピングします」ということを意味しています。
+これをkubectl apply すると、blog という名前のService が作成されたことになります。このマニフェストは「app:blog というラベルが付いたアプリケーションのためにポート8080 を公開し、Pod の中のコンテナが待ち受けているポート8080 にマッピングします」ということを意味しています。
 
 既にこのService は作成されているため、Service の詳細を確認してみましょう。
 
@@ -114,7 +124,7 @@ SELECTOR に注目しましょう。これはマニフェスト中のspec.select
 kubectl get pods -l app=blog -o name
 ```
 {{<hint info>}}
-ラベル管理を適切にしないと、意図しないPod がService のバックエンドに配置される場合があります。
+ラベル管理を適切に設定しないと、意図しないPod がService のバックエンドに配置される場合があります。
 {{</hint>}}
 
 なお、サービスに対して登録されているポッドのIPアドレスは、次のように実行することで確認できます。
@@ -169,26 +179,13 @@ Ingress も既に作成しているので、以下のコマンドで確認する
 kubectl get ingress -l app=blog
 ```
 
-払い出されたURL を使ってWebブラウザからフロントエンドのWebアプリケーションにアクセスできます。ターミナルではなく、ブラウザの別タブから払い出されたURL にアクセスしてください。
-```shell
-NS=$(kubectl config view -o jsonpath='{.contexts[].context.namespace}')
-echo $NS
-```
-```shell
-http://blog-${NS}.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
-```
+前の手順で試したように、Ingress によって払い出されたURL を使ってWeb ブラウザからフロントエンドのWebアプリケーションにアクセスできます。
 
-{{<hint info>}}
-1つ目のコマンドはこの環境で払い出されるURL 名の一部（名前空間）を取得しています。URL 中の${NS} は取得した名前空間で置き換えてください。例えば下記のようになります。
+なお、このようにIngress によって払い出されたURL でアクセスするためには、トラフィックをKubernetesクラスタに向けるために、外部のドメインネームサーバ（DNS）でワイルドカードCNAMEが設定されている必要があります（この環境では既に設定されています）。
 
-http://blog-eduk8s-labs-w01-s287.tdc-reg-prod-d66138e.tanzu-labs.esp.vmware.com
+{{<details "補足" >}}
+実はIngress リソースだけではアプリケーションを公開できません。実際に外部からのトラフィックを適切にルーティングしているのはLoadBalancer と呼ばれるService リソースだからです。同じService リソースでも、ClusterIP と異なり、LoadBalancer はクラスタ内部ではなく、クラスタの外と中のネットワークと繋げる役割を持ちます。
 
-{{</hint>}}
+https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
 
-{{<hint warning>}}
-この時点では 500 Internal Server Error が表示されることに注意してください。
-{{</hint>}}
-
-このリンクをクリックして、フロントエンドのWebアプリケーションにアクセスします。利用できないと表示された場合は、利用できるようになるまでページを更新してください。これは、Ingress ルーティングの再設定に時間がかかるためです。
-
-これは、このホストのトラフィックをKubernetesクラスタのルータに向けるために、外部のドメインネームサーバ（DNS）でワイルドカードCNAMEがすでに事前に設定されているために機能することに注意してください。これが自分のKubernetesクラスタであれば、使用したいホストのDNSに適切なCNAMEを設定する必要があります。
+{{</details>}}

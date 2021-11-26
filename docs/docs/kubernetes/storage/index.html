@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ストレージの基本 #  繰り返しになりますが、Pod は短命です。Pod は簡単に削除されるため、データを残したい場合は何かしらの形で外部に保存する仕組みが必要です。その1 つがPersistent Volume （PV）になります。
+<meta name="description" content="本セクションで学習すること #   PV とPVC によるデータの永続化 データベースとの接続のための環境変数とSecret リソース  ストレージの基本 #  繰り返しになりますが、Pod は短命です。Pod は簡単に削除されるため、データを残したい場合は何かしらの形で外部に保存する仕組みが必要です。その1 つがPersistent Volume （PV）になります。
 PV はその名の通り永続ストレージであり、PV の中にデータを保存することができます。PV をPod に割り当てるにはいくつか方法がありますが、代表的なものとしてPersistent Volume Claim (PVC) を使う方法があります。PVC はPV を要求するために使われるリソースであり、そのマニフェストの中には例えば要求するストレージのサイズなどが定義されます。Pod がデータを保存するためにPV を使いたい場合は、直接PV をアタッチするのではなく、PVC をアタッチします。
-PVC のマニフェストを見てみましょう。
+ 物理ストレージをKubernetes 用に抽象化したものがPVで、それをPod にアタッチするためにPVC が使われます。  PVC のマニフェストを見てみましょう。
 cat ~/database/persistentvolumeclaim.yaml apiVersion: v1kind: PersistentVolumeClaimmetadata:name: blog-medialabels:app: blogspec:accessModes:- ReadWriteOnceresources:requests:storage: 1Gi ここでは、ストレージのサイズは少なくとも1Giで、アクセスモードはReadWriteOnce である必要があります。アクセスモードとは、払い出すPV がどのようにRead/Write されうるかを示しており、以下の4 つがあります。
  ReadWriteOnce(RWO) - 単一のノードからRead/Write 可能としてボリュームをマウントします。 ReadOnlyMany (ROX) - 複数のノードによって読み取り専用としてボリュームをマウントします。 ReadWriteMany (RWX) - 複数のノードによってRead/Write 可能としてボリュームをマウントします。 ReadWriteOncePod (RWOP) - 単一のPod からRead/Write 可能としてボリュームをマウントします。  なお、使用するKubernetes クラスタによってはRWX が使えないなどの制約があります。">
 <meta name="theme-color" content="#FFFFFF">
@@ -19,7 +19,7 @@ cat ~/database/persistentvolumeclaim.yaml apiVersion: v1kind: PersistentVolumeC
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.dbfff858539add17c57d4534868254a5553d511719a398ac7cc7918ea84b3ff0.js" integrity="sha256-2//4WFOa3RfFfUU0hoJUpVU9URcZo5isfMeRjqhLP/A=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -211,24 +211,6 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
-  
-
-          
-  <ul>
-    
-  </ul>
-
-        </li>
-      
-    
-      
-        <li>
-          
-  
-  
-
-  
     <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class="">ネットワーク</a>
   
 
@@ -248,6 +230,24 @@ https://github.com/alex-shpak/hugo-book
 
   
     <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class=" active">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
   
 
           
@@ -333,6 +333,7 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
     <li><a href="#ストレージの基本">ストレージの基本</a></li>
     <li><a href="#データベースとの接続">データベースとの接続</a></li>
     <li><a href="#環境変数">環境変数</a></li>
@@ -349,12 +350,26 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h2 id="ストレージの基本">
+  <article class="markdown"><h2 id="本セクションで学習すること">
+  本セクションで学習すること
+  <a class="anchor" href="#%e6%9c%ac%e3%82%bb%e3%82%af%e3%82%b7%e3%83%a7%e3%83%b3%e3%81%a7%e5%ad%a6%e7%bf%92%e3%81%99%e3%82%8b%e3%81%93%e3%81%a8">#</a>
+</h2>
+<ul>
+<li>PV とPVC によるデータの永続化</li>
+<li>データベースとの接続のための環境変数とSecret リソース</li>
+</ul>
+<h2 id="ストレージの基本">
   ストレージの基本
   <a class="anchor" href="#%e3%82%b9%e3%83%88%e3%83%ac%e3%83%bc%e3%82%b8%e3%81%ae%e5%9f%ba%e6%9c%ac">#</a>
 </h2>
 <p>繰り返しになりますが、Pod は短命です。Pod は簡単に削除されるため、データを残したい場合は何かしらの形で外部に保存する仕組みが必要です。その1 つがPersistent Volume （PV）になります。</p>
 <p>PV はその名の通り永続ストレージであり、PV の中にデータを保存することができます。PV をPod に割り当てるにはいくつか方法がありますが、代表的なものとしてPersistent Volume Claim (PVC) を使う方法があります。PVC はPV を要求するために使われるリソースであり、そのマニフェストの中には例えば要求するストレージのサイズなどが定義されます。Pod がデータを保存するためにPV を使いたい場合は、直接PV をアタッチするのではなく、PVC をアタッチします。</p>
+<p><figure><img src="k_pvc.png" width="100%"style="display: block; margin: auto;"/>
+</figure>
+<blockquote class="book-hint info">
+  物理ストレージをKubernetes 用に抽象化したものがPVで、それをPod にアタッチするためにPVC が使われます。
+</blockquote>
+</p>
 <p>PVC のマニフェストを見てみましょう。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat ~/database/persistentvolumeclaim.yaml
 </code></pre></div><pre><code>apiVersion: v1
@@ -412,7 +427,7 @@ spec:
 </p>
 <details ><summary>補足</summary>
   <div class="markdown-inner">
-    今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から、画像を保存するPV にアクセスさせることを可能にしたいため、厳密にいえばReadWriteMany のPV を使うべきですが、環境に寄ってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnceのストレージで十分です。
+    今回使用しているフロントエンドのWebアプリケーションでは、複数のノードにまたがる複数のPod から画像を保存するPV にアクセスさせることを可能にしたいため（そうしないとアクセスするWeb アプリケーションPod によって表示される画像が異なる可能性がある）、厳密にいえばReadWriteMany のPV を使うべきですが、環境によってはReadWriteMany が使えない場合があるため、特定のノードに固定してデプロイされるようにしています(マニフェストではaffinity として設定されています)。一方、データベースは1 つのインスタンスしか持たないので、アクセスモードがReadWriteOnce のストレージで十分です。
   </div>
 </details>
 
@@ -420,10 +435,10 @@ spec:
   データベースとの接続
   <a class="anchor" href="#%e3%83%87%e3%83%bc%e3%82%bf%e3%83%99%e3%83%bc%e3%82%b9%e3%81%a8%e3%81%ae%e6%8e%a5%e7%b6%9a">#</a>
 </h2>
-<p>フロントエンドのWebアプリケーションが動作しており、インターネットからアクセスできます。データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働しているPostgresqlデータベースを使用するように設定されています。</p>
+<p>フロントエンドのWebアプリケーションが動作しており、インターネットからアクセスできます。データの永続性を確保し、アプリケーションのすべてのインスタンスで同じデータベースを使用するために、フロントエンドのWebアプリケーションでは、すでに稼働しているPostgresql データベースを使用するように設定されています。</p>
 <p>データベースのリソースを表示するには、以下を実行します。</p>
-<p>kubectl get deployment,service,pvc,secret -l app=blog-db -o name</p>
-<pre><code>deployment.apps/blog-db
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get deployment,service,pvc,secret -l app<span style="color:#f92672">=</span>blog-db -o name
+</code></pre></div><pre><code>deployment.apps/blog-db
 service/blog-db
 persistentvolumeclaim/blog-database
 secret/blog-credentials
@@ -437,12 +452,13 @@ secret/blog-credentials
 <p>フロントエンドWebアプリケーションにどのような環境変数がすでに設定されているかは、次のように実行すればわかります。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl set env deployment/blog --list
 </code></pre></div><p>以下のように表示されるはずです。</p>
-<p>#Deployment blog, container blog
+<pre><code>#Deployment blog, container blog
 BLOG_SITE_NAME=EduK8S Blog
 DATABASE_HOST=blog-db
 #DATABASE_USER from secret blog-credentials, key database-user
 #DATABASE_PASSWORD from secret blog-credentials, key database-password
-#DATABASE_NAME from secret blog-credentials, key database-name</p>
+#DATABASE_NAME from secret blog-credentials, key database-name
+</code></pre>
 <p>Pod 中のすべての環境変数を確認したい場合は以下のように実行することもできます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">DB<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>kubectl get pod -l app<span style="color:#f92672">=</span>blog-db -o template --template <span style="color:#e6db74">&#39;{{range .items}}{{.metadata.name}}{{&#34;\n&#34;}}{{end}}&#39;</span>. | head -1<span style="color:#e6db74">`</span> 
 kubectl exec $DB -- env
@@ -463,17 +479,18 @@ kubectl exec $DB -- env
 </h2>
 <p>データベースの認証情報も同様にマニフェストに直接環境変数を書き込んで追加することができますが、Deployment のマニフェストとは別に管理するために、Secret を使うことが一般的です。このWeb アプリケーションでは、blog-credentialsというシークレットを見ることができます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get secret/blog-credentials -o yaml
-</code></pre></div><p>出力の中では、dataセクションに値が入っているのがわかります。</p>
-<p>data:
-database-name: YmxvZw==
-database-password: dG9wLXNlY3JldA==
-database-user: YmxvZw==</p>
+</code></pre></div><p>出力の中では、data セクションに値が入っているのがわかります。</p>
+<pre><code>data:
+  database-name: YmxvZw==
+  database-password: dG9wLXNlY3JldA==
+  database-user: YmxvZw==
+</code></pre>
 <p>表示されているのは、base64 エンコーディングで難読化されているため、実際の値ではありません。なお、デコードすると以下のようになります。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">echo dG9wLXNlY3JldA<span style="color:#f92672">==</span> | base64 -d
 </code></pre></div><pre><code>top-secret
 </code></pre>
 <p>このSecret をファイルとしてコンテナに渡すこともできますが、この例ではSecret の値をPod の環境変数として注入していることに注意してください。</p>
-<p>いずれにせよ、これでどのデータベースにどのようにアクセスすべきか、フロントエンドのWeb アプリケーションに伝えることができました。</p>
+<p>やや込み入った内容ですが、どのデータベースにどのようにアクセスすべきか、環境変数やSecret といった方法を使って、フロントエンドのWeb アプリケーションに伝えることができたということを押さえれば十分です。</p>
 </article>
  
       
@@ -515,6 +532,7 @@ database-user: YmxvZw==</p>
   
 <nav id="TableOfContents">
   <ul>
+    <li><a href="#本セクションで学習すること">本セクションで学習すること</a></li>
     <li><a href="#ストレージの基本">ストレージの基本</a></li>
     <li><a href="#データベースとの接続">データベースとの接続</a></li>
     <li><a href="#環境変数">環境変数</a></li>

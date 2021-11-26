@@ -2,8 +2,11 @@
 weight: 2
 title: "リソースの詳細"
 ---
+## 本セクションで学習すること
+- Deployment、Replicaset、Pod の概要
+- Pod のスケールアウト
 
-## Deployment, Replicaset, 
+## Deployment について
 前の手順でDeployment を作成しましたが、Deployment は追加のリソースを作成します。調べてみましょう。
 ```shell
 kubectl get all -o name -l app=blog
@@ -17,9 +20,11 @@ pod/blog-6b8999855c-zk8pg
 deployment.apps/blog
 replicaset.apps/blog-6b8999855c
 ```
-Deployment を作成しただけなのに、結果的にReplicaset とPod のリソースが追加で作成されています。
+Deployment の作成によって、結果的にReplicaset とPod のリソースが追加で作成されています。
 
 これは、Deploymentが、Replicaset を作成するためのテンプレートとして機能するためです。また、Replicaset は、Pod を作成するためのテンプレートとして機能します。Pod は、アプリケーションのインスタンスを表すものです。このケースでは、レプリカの数が2に設定されているため、2つのPod が存在します。
+
+{{< figure src="k_deployment.png" width="75%">}}
 
 Replicaset のリソース定義を表示するには、次のように実行します。
 ```shell
@@ -75,10 +80,14 @@ Replicaset とPod の両方で、多くのフィールドが追加されてい�
 いずれにしても、これらのデフォルト値が正しくないことが判明し、それらを変更する必要がある場合、または追加の設定を追加する必要がある場合は、その変更をDeployment で行う必要があります。Replicaset やPod を自分で直接編集してはいけません。代わりにDeployment を更新してください。Replicaset とPod のインスタンスは、それに対応して更新されます。
 
 {{<hint info>}}
-Kubernetes の世界ではマニフェストがすべてです。例えばReplicaset のマニフェストを直接編集すると、それを管理するDeployment との整合性にズレが生じるため、整合性を取るようDeployment のマニフェストに従うように再構成されます。すなわち、Replicaset を編集したところで、自動的に編集前の状態に戻ります。
+Kubernetes の世界ではマニフェストがすべてです。例えばReplicaset のマニフェストを直接編集し、それを管理するDeployment との整合性にズレが生じた場合、整合性を取るようDeployment のマニフェストに従うように再構成されます。
 {{</hint>}}
 
 アプリケーションを削除する際には、先ほどフロントエンドのWebアプリケーションで行ったように、Replicaset もPod も明示的に削除する必要はありません。これは、Pod は作成元のReplicaset が所有するものとしてマークアップされ、Replicaset はDeployment が所有するものとしてマークされるためです。Deoloyment を削除すると、Replicaset と、そこから作成されたPod は自動的に削除されます。
+
+{{<hint info>}}
+長々と書いていますが、要するにKubernetes でアプリケーションをデプロイしたい場合は基本的にDeployment リソースを使う、とだけ覚えれば十分です。
+{{</hint>}}
 
 ## スケールアウト
 Pod をスケールアウトしてみましょう。先ほど説明した通り、Pod やReplicaset を編集するのではなく、Deployment のマニフェスト中のspec.replicas の値を変更する必要があります。今回は、レプリカの数を3 に増やすために、Deployment のマニフェストを更新し、再びApply してみましょう。
@@ -94,13 +103,10 @@ kubectl apply -f ~/frontend/deployment.yaml
 
 このように、非常に簡単にPod をスケールアウトさせることができました。仮想マシンの場合、通常このように即座にスケールアウトすることはできません。コンテナを利用する1 つのメリットとして、このように拡張性に非常に優れることが挙げられます。
 
-
 ## Pod とコンテナ
 Pod がアプリケーションのインスタンスを表すことはすでに述べたとおりです。
 
-より正確に言うと、Pod は、実行中のコンテナのグループを表す抽象的なもので、Pod はコンテナの管理およびスケーリングをするための単なるグルーピングにすぎません。
-
-ほとんどの場合、Pod は1つのコンテナのみで構成されます。1つのPod で複数のコンテナを実行するユースケースもありますが、一般的には例外的なケースです。
+より正確に言うと、Pod は、実行中のコンテナのグループを表す抽象的なもので、Pod はコンテナの管理およびスケーリングをするための単なるグルーピングにすぎません。ほとんどの場合、Pod は1つのコンテナのみで構成されます。1つのPod で複数のコンテナを実行するユースケースもありますが、ここでは1 Pod = 1 コンテナと覚えてしまっても差し支えありません。
 
 今回のハンズオンで使用するサンプルアプリケーションを見ると、2つの別々のDeployment があります。1つはフロントエンドのWeb サーバー用、もう1つはデータベース用です。
 
@@ -112,7 +118,7 @@ kubectl get deployment
     blog      2/2     2            2           64s
     blog-db   1/1     1            1           34s
 
-このようにDeployment を分けることで、フロントエンドのWebアプリケーションをデータベースとは別に複数のインスタンスにスケールアップすることができます。両方のコンポーネントが1 つのDeployment の一部として作成され、Pod の別々のコンテナで実行されていた場合、アプリケーションを複数のインスタンスにスケールアップすることはできません。これは、データベースはデータと紐づくため（＝ステートフル）、データの整合性などを気にする必要があり、Web サーバーのようなステートレスアプリケーションのようにレプリカ数を簡単に増やすことはできないからです。
+このようにDeployment を分けることで、フロントエンドのWebアプリケーションをデータベースとは別に複数のインスタンスにスケールアウトすることができます。両方のコンポーネントが1 つのDeployment の一部として作成され、Pod の別々のコンテナで実行されていた場合、アプリケーションを複数のインスタンスにスケールアウトすることはできません。これは、データベースはデータと紐づくため（＝ステートフル）、データの整合性などを気にする必要があり、Web サーバーのようなステートレスアプリケーションのようにレプリカ数を簡単に増やすことはできないからです。
 
 ### その他のリソース
 本ハンズオンでは紹介できませんが、Kubernetes には他にも沢山のリソースがあります。また、自分でリソースを作ることもできます。詳細はKubernetes のドキュメントを参照してください。
@@ -120,10 +126,25 @@ kubectl get deployment
 参考 : [https://kubernetes.io/docs/concepts/](https://kubernetes.io/docs/concepts/)
 
 ## 演習
-Deployment で管理されるPod (Deployment > Replicaset > Pod) を手動で削除した場合、何が起こると考えられますか？
+1. 以下を参考に、nginx のバージョン1.14.2 のコンテナイメージを使ったDeployment を作成してください(作成中エラーが出ますが想定通りです)。その後、作成したDeployment を削除をしてください。
+   https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/
+2. Deployment で管理されるPod (Deployment > Replicaset > Pod) を手動で削除した場合、何が起こると考えられますか？
  
 {{<details "解答" >}}
-Deployment のマニフェストの中のReplicaset のspec でPod のレプリカ数を定義しているため、Replicaset のマニフェストと整合性を取るよう、Pod が再作成されます。確かめてみましょう。
+1. ドキュメント中のマニフェストをそのまま使いましょう。vim 等で作成してもよいですが、URL を直接引数に入れることができます。
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/application/deployment.yaml
+```
+デプロイされたDeployment、Replicaset、Pod を見てみましょう。
+```shell
+kubectl get deployment,replicaset,pod
+```
+エラーが出てコンテナの作成に失敗していますが、無視し、確認したら削除をします。Pod やReplicaset を個別に削除する必要はありません。
+```shell
+kubectl delete -f https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/application/deployment.yaml
+```
+
+2. Deployment のマニフェストの中のReplicaset のspec でPod のレプリカ数を定義しているため、Replicaset のマニフェストと整合性を取るよう、Pod が再作成されます。確かめてみましょう。
 
 まずは今稼働しているPod を表示してみましょう。
 ```shell

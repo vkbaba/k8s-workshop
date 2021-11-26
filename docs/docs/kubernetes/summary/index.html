@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="まとめ #  今回のハンズオンでは、Kubernetes を実際に触ってみて、フロントエンドのWebアプリケーションからなるアプリケーションをデプロイし、バックエンドのPostrgreSQLデータベースを使ってブログサイトを実装しました。もう一度アプリケーションをデプロイし、振り返ってみましょう。
-Kubernetesの一般的な情報については、以下を参照してください。
-https://kubernetes.io/
+<meta name="description" content="まとめ #  本ハンズオンでは以下のことを学習しました。
+基本操作 #   Kubernetes の概要 kubectl を使った基本的な操作 アプリケーション（ブログサイト）のデプロイ  リソースの詳細 #   Deployment、Replicaset、Pod の概要 Pod のスケールアウト  ネットワーク #   Kubernetes の名前空間 Pod 間通信とCNI Servie リソース Ingress リソース （補足）Kubernetes におけるLoadBalancer  ストレージとデータベース #   PV とPVC によるデータの永続化 データベースとの接続のための環境変数とSecret リソース  トラブルシューティング #   Kubernetes の場合のコンテナのログ取得 Kubernetes の場合のコンテナへのアクセス  ラボを終了する場合は、ブラウザのタブを閉じるか、Terminate ボタンをクリックしてください。 
 自分のPC でKubernetesを試してみたい方は、ぜひTanzu Community Edition を使ってみてください。
 https://tanzucommunityedition.io/">
 <meta name="theme-color" content="#FFFFFF">
@@ -19,7 +18,7 @@ https://tanzucommunityedition.io/">
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.1a9d8b3dc31023934359c43d4d289415837e9b6f5ca9be059e54f2a54de39969.js" integrity="sha256-Gp2LPcMQI5NDWcQ9TSiUFYN&#43;m29cqb4FnlTypU3jmWk=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.dbfff858539add17c57d4534868254a5553d511719a398ac7cc7918ea84b3ff0.js" integrity="sha256-2//4WFOa3RfFfUU0hoJUpVU9URcZo5isfMeRjqhLP/A=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -211,24 +210,6 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
-  
-
-          
-  <ul>
-    
-  </ul>
-
-        </li>
-      
-    
-      
-        <li>
-          
-  
-  
-
-  
     <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/network/" class="">ネットワーク</a>
   
 
@@ -248,6 +229,24 @@ https://github.com/alex-shpak/hugo-book
 
   
     <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/storage/" class="">ストレージとデータベース</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="https://vkbaba.github.io/k8s-workshop/docs/kubernetes/troubleshooting/" class="">トラブルシューティング</a>
   
 
           
@@ -333,7 +332,15 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#まとめ">まとめ</a>
+      <ul>
+        <li><a href="#基本操作">基本操作</a></li>
+        <li><a href="#リソースの詳細">リソースの詳細</a></li>
+        <li><a href="#ネットワーク">ネットワーク</a></li>
+        <li><a href="#ストレージとデータベース">ストレージとデータベース</a></li>
+        <li><a href="#トラブルシューティング">トラブルシューティング</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -350,11 +357,54 @@ https://github.com/alex-shpak/hugo-book
   まとめ
   <a class="anchor" href="#%e3%81%be%e3%81%a8%e3%82%81">#</a>
 </h2>
-<p>今回のハンズオンでは、Kubernetes を実際に触ってみて、フロントエンドのWebアプリケーションからなるアプリケーションをデプロイし、バックエンドのPostrgreSQLデータベースを使ってブログサイトを実装しました。もう一度アプリケーションをデプロイし、振り返ってみましょう。</p>
-<p>Kubernetesの一般的な情報については、以下を参照してください。</p>
-<p><a href="https://kubernetes.io/" target="_blank">
-    https://kubernetes.io/
-</a></p>
+<p>本ハンズオンでは以下のことを学習しました。</p>
+<h3 id="基本操作">
+  基本操作
+  <a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e6%93%8d%e4%bd%9c">#</a>
+</h3>
+<ul>
+<li>Kubernetes の概要</li>
+<li>kubectl を使った基本的な操作</li>
+<li>アプリケーション（ブログサイト）のデプロイ</li>
+</ul>
+<h3 id="リソースの詳細">
+  リソースの詳細
+  <a class="anchor" href="#%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9%e3%81%ae%e8%a9%b3%e7%b4%b0">#</a>
+</h3>
+<ul>
+<li>Deployment、Replicaset、Pod の概要</li>
+<li>Pod のスケールアウト</li>
+</ul>
+<h3 id="ネットワーク">
+  ネットワーク
+  <a class="anchor" href="#%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af">#</a>
+</h3>
+<ul>
+<li>Kubernetes の名前空間</li>
+<li>Pod 間通信とCNI</li>
+<li>Servie リソース</li>
+<li>Ingress リソース</li>
+<li>（補足）Kubernetes におけるLoadBalancer</li>
+</ul>
+<h3 id="ストレージとデータベース">
+  ストレージとデータベース
+  <a class="anchor" href="#%e3%82%b9%e3%83%88%e3%83%ac%e3%83%bc%e3%82%b8%e3%81%a8%e3%83%87%e3%83%bc%e3%82%bf%e3%83%99%e3%83%bc%e3%82%b9">#</a>
+</h3>
+<ul>
+<li>PV とPVC によるデータの永続化</li>
+<li>データベースとの接続のための環境変数とSecret リソース</li>
+</ul>
+<h3 id="トラブルシューティング">
+  トラブルシューティング
+  <a class="anchor" href="#%e3%83%88%e3%83%a9%e3%83%96%e3%83%ab%e3%82%b7%e3%83%a5%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0">#</a>
+</h3>
+<ul>
+<li>Kubernetes の場合のコンテナのログ取得</li>
+<li>Kubernetes の場合のコンテナへのアクセス</li>
+</ul>
+<p>ラボを終了する場合は、ブラウザのタブを閉じるか、Terminate ボタンをクリックしてください。
+<figure><img src="k_terminate.png" width="75%"style="display: block; margin: auto;"/>
+</figure></p>
 <p>自分のPC でKubernetesを試してみたい方は、ぜひTanzu Community Edition を使ってみてください。</p>
 <p><a href="https://tanzucommunityedition.io/" target="_blank">
     https://tanzucommunityedition.io/
@@ -400,7 +450,15 @@ https://github.com/alex-shpak/hugo-book
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#まとめ">まとめ</a>
+      <ul>
+        <li><a href="#基本操作">基本操作</a></li>
+        <li><a href="#リソースの詳細">リソースの詳細</a></li>
+        <li><a href="#ネットワーク">ネットワーク</a></li>
+        <li><a href="#ストレージとデータベース">ストレージとデータベース</a></li>
+        <li><a href="#トラブルシューティング">トラブルシューティング</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
