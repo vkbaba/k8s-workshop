@@ -97,8 +97,11 @@ sed -i -e "s/replicas: 2/replicas: 3/" ~/frontend/deployment.yaml
 kubectl apply -f ~/frontend/deployment.yaml
 ```
 
-    kubectl get pods -l app=blog
+Pod の状態を確認しましょう。
 
+```shell
+kubectl get pods -l app=blog
+```
 コマンドをすぐに実行した場合、「Pending（保留）」または「ContainerCreating（コンテナ作成中）」状態のPod が表示されることがあります。これは新しいPod が起動しているところです。Running 状態のPodが3つ表示されるまで、kubectl get podsを実行し続けます。
 
 このように、非常に簡単にPod をスケールアウトさせることができました。仮想マシンの場合、通常このように即座にスケールアウトすることはできません。コンテナを利用する1 つのメリットとして、このように拡張性に非常に優れることが挙げられます。
