@@ -21,7 +21,7 @@ kubectl get replicaset -l app=blog -o yaml spec:replicas: 2selector:matchLabe
 <link rel="icon" href="/k8s-workshop/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/k8s-workshop/book.min.46181bc93375ba932026e753b37c40e6ff8bb16a9ef770c78bcc663e4577b1ba.css" integrity="sha256-RhgbyTN1upMgJudTs3xA5v&#43;LsWqe93DHi8xmPkV3sbo=" crossorigin="anonymous">
   <script defer src="/k8s-workshop/flexsearch.min.js"></script>
-  <script defer src="/k8s-workshop/en.search.min.dbfff858539add17c57d4534868254a5553d511719a398ac7cc7918ea84b3ff0.js" integrity="sha256-2//4WFOa3RfFfUU0hoJUpVU9URcZo5isfMeRjqhLP/A=" crossorigin="anonymous"></script>
+  <script defer src="/k8s-workshop/en.search.min.a94fca51d770d9b8d20e0345c83079c0ad76d51a6dc6be3f78ea0064bbfbc76e.js" integrity="sha256-qU/KUddw2bjSDgNFyDB5wK121Rptxr4/eOoAZLv7x24=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -437,9 +437,9 @@ template:
 <p>Pod をスケールアウトしてみましょう。先ほど説明した通り、Pod やReplicaset を編集するのではなく、Deployment のマニフェスト中のspec.replicas の値を変更する必要があります。今回は、レプリカの数を3 に増やすために、Deployment のマニフェストを更新し、再びApply してみましょう。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sed -i -e <span style="color:#e6db74">&#34;s/replicas: 2/replicas: 3/&#34;</span> ~/frontend/deployment.yaml
 kubectl apply -f ~/frontend/deployment.yaml
-</code></pre></div><pre><code>kubectl get pods -l app=blog
-</code></pre>
-<p>コマンドをすぐに実行した場合、「Pending（保留）」または「ContainerCreating（コンテナ作成中）」状態のPod が表示されることがあります。これは新しいPod が起動しているところです。Running 状態のPodが3つ表示されるまで、kubectl get podsを実行し続けます。</p>
+</code></pre></div><p>Pod の状態を確認しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">kubectl get pods -l app<span style="color:#f92672">=</span>blog
+</code></pre></div><p>コマンドをすぐに実行した場合、「Pending（保留）」または「ContainerCreating（コンテナ作成中）」状態のPod が表示されることがあります。これは新しいPod が起動しているところです。Running 状態のPodが3つ表示されるまで、kubectl get podsを実行し続けます。</p>
 <p>このように、非常に簡単にPod をスケールアウトさせることができました。仮想マシンの場合、通常このように即座にスケールアウトすることはできません。コンテナを利用する1 つのメリットとして、このように拡張性に非常に優れることが挙げられます。</p>
 <h2 id="pod-とコンテナ">
   Pod とコンテナ
