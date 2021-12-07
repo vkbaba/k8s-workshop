@@ -124,7 +124,7 @@ kubectl exec $DB -- env
 
 Web アプリケーションのDeployment のマニフェストを確認すると、環境変数が定義されていることが分かります。
 ```shell
-cat ~/frontent/deployment.yaml
+cat ~/frontend/deployment.yaml
 ```
     spec:
       containers:
